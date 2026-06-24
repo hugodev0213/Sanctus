@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sanctus — A vida espiritual católica num só lugar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ═══════════════════════════════════════
+   SHARED TOKENS
+═══════════════════════════════════════ */
+:root {
+  --bg:#F5F3EE; --surface:#FFFFFF; --surface-2:#F1EEE7;
+  --surface-glass:rgba(245,243,238,.88);
+  --ink:#1C1E2E; --ink-soft:#5A6070; --ink-faint:#9DA4B0;
+  --marian:#1E3F72; --marian-2:#2C5499; --marian-soft:#5a7bad;
+  --gold:#A8782A; --gold-soft:#C9A96B;
+  --line:rgba(28,30,46,.09); --line-soft:rgba(28,30,46,.06);
+  --rose:#a64f5e; --green:#5a7d52;
+  --shadow:0 4px 24px rgba(28,30,46,.07);
+  --shadow-lg:0 12px 40px rgba(28,30,46,.12);
+  --radius:20px;
+}
+[data-theme="dark"] {
+  --bg:#0c1020; --surface:#151b32; --surface-2:#1c2440;
+  --surface-glass:rgba(21,27,50,.88);
+  --ink:#ece9e0; --ink-soft:#a6adc0; --ink-faint:#626b86;
+  --marian:#7d9ed1; --marian-2:#5a7bad; --marian-soft:#5a7bad;
+  --gold:#c9a96b; --gold-soft:#9c8451;
+  --line:rgba(255,255,255,.08); --line-soft:rgba(255,255,255,.05);
+  --rose:#c97f8c; --green:#8aab80;
+  --shadow:0 4px 24px rgba(0,0,0,.3);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.45);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;transition:background .4s,color .4s;}
+body.app-mode{overflow:hidden;}
+
+/* ═══════════════════════════════════════
+   LANDING — NAV
+═══════════════════════════════════════ */
+.l-nav{
+  position:fixed;top:0;left:0;right:0;z-index:80;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 5vw;height:68px;
+  background:rgba(245,243,238,.9);
+  backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border-bottom:1px solid rgba(28,30,46,.07);
+  transition:background .4s;
+}
+[data-theme="dark"] .l-nav{background:rgba(12,16,32,.9);}
+.l-nav-logo{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:.04em;text-decoration:none;}
+.l-nav-cross{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:var(--marian);border-radius:8px;color:#fff;font-size:13px;}
+.l-nav-links{display:flex;align-items:center;gap:28px;}
+.l-nav-links a{font-size:14px;font-weight:500;color:var(--ink-soft);text-decoration:none;transition:color .2s;}
+.l-nav-links a:hover{color:var(--ink);}
+.l-nav-cta,.l-btn-primary{
+  background:var(--marian);color:#fff;border:none;border-radius:30px;
+  padding:10px 22px;font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:all .25s;letter-spacing:.01em;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.l-nav-cta:hover,.l-btn-primary:hover{background:var(--marian-2);transform:translateY(-1px);box-shadow:0 6px 22px rgba(30,63,114,.3);}
+.l-btn-secondary{
+  background:transparent;color:var(--ink);border:1.5px solid var(--line);
+  border-radius:50px;padding:13px 24px;font-size:14px;font-weight:500;cursor:pointer;
+  font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:8px;transition:all .25s;
+}
+.l-btn-secondary:hover{border-color:var(--marian);color:var(--marian);}
+
+/* ═══════════════════════════════════════
+   LANDING — HERO
+═══════════════════════════════════════ */
+.l-hero{
+  min-height:100vh;padding-top:68px;
+  display:grid;grid-template-columns:1fr 1.05fr .95fr;
+  align-items:center;gap:0;
+  max-width:1320px;margin:0 auto;padding-left:5vw;padding-right:5vw;padding-bottom:60px;
+}
+.l-phones{position:relative;height:520px;display:flex;align-items:center;justify-content:center;}
+.l-phone-back{position:absolute;left:0;top:50%;transform:translateY(-50%) rotate(-6deg);transform-origin:center bottom;filter:drop-shadow(0 24px 48px rgba(28,30,46,.18));animation:lFloatB 6s ease-in-out infinite;}
+.l-phone-front{position:absolute;right:0;top:50%;transform:translateY(-54%) rotate(3deg);transform-origin:center bottom;filter:drop-shadow(0 28px 56px rgba(30,63,114,.22));animation:lFloatF 5s ease-in-out infinite .8s;}
+@keyframes lFloatB{0%,100%{transform:translateY(-50%) rotate(-6deg);}50%{transform:translateY(-53%) rotate(-6deg);}}
+@keyframes lFloatF{0%,100%{transform:translateY(-54%) rotate(3deg);}50%{transform:translateY(-50%) rotate(3deg);}}
+.l-text{padding:0 24px 0 20px;}
+.l-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+.l-eyebrow::before{content:'';width:20px;height:1.5px;background:var(--gold);border-radius:1px;}
+.l-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,3.4vw,50px);font-weight:500;line-height:1.08;letter-spacing:-.01em;margin-bottom:20px;}
+.l-h1 em{font-style:italic;color:var(--marian);}
+.l-p{font-size:clamp(14px,1.1vw,15.5px);line-height:1.7;color:var(--ink-soft);max-width:420px;margin-bottom:32px;}
+.l-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.l-btn-primary{padding:14px 26px;font-size:14px;box-shadow:0 4px 24px rgba(30,63,114,.28);}
+.l-note{font-size:12px;color:var(--ink-faint);display:flex;align-items:center;gap:6px;}
+.l-note::before{content:'✓';color:var(--gold);font-weight:700;}
+/* experiment CTA */
+.l-experiment{
+  margin-top:22px;display:flex;align-items:center;gap:12px;
+  padding:16px 20px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;cursor:pointer;
+  transition:all .25s;box-shadow:var(--shadow);
+}
+.l-experiment:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.l-exp-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--marian),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0;}
+.l-exp-text .t{font-size:13.5px;font-weight:600;color:var(--ink);}
+.l-exp-text .s{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+.l-exp-arrow{margin-left:auto;color:var(--ink-faint);font-size:18px;}
+
+/* ═══════════════════════════════════════
+   LANDING — CAROUSEL
+═══════════════════════════════════════ */
+.l-carousel{position:relative;}
+.l-track{position:relative;height:440px;}
+.l-card{position:absolute;inset:0;border-radius:24px;overflow:hidden;opacity:0;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.3,1);transform:translateX(18px) scale(.97);pointer-events:none;}
+.l-card.active{opacity:1;transform:translateX(0) scale(1);pointer-events:auto;}
+.l-card-svg{width:100%;height:56%;display:block;}
+.l-card-body{background:var(--marian);color:#fff;padding:20px 22px;height:44%;display:flex;flex-direction:column;justify-content:center;}
+.l-card-tag{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:8px;}
+.l-card-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:6px;line-height:1.15;}
+.l-card-desc{font-size:13px;line-height:1.5;color:rgba(255,255,255,.82);}
+.l-controls{display:flex;gap:10px;margin-top:14px;justify-content:flex-end;align-items:center;}
+.l-dot{width:8px;height:8px;border-radius:50%;background:var(--ink-faint);cursor:pointer;transition:all .25s;border:none;}
+.l-dot.active{background:var(--marian);width:22px;border-radius:4px;}
+.l-arrow{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);transition:all .2s;}
+.l-arrow:hover{border-color:var(--marian);color:var(--marian);}
+.l-arrow svg{width:16px;height:16px;}
+
+/* ═══════════════════════════════════════
+   LANDING — SECTIONS
+═══════════════════════════════════════ */
+.l-strip{background:var(--marian);color:#fff;display:flex;justify-content:center;gap:60px;align-items:center;padding:28px 5vw;flex-wrap:wrap;}
+.l-strip-num{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;line-height:1;margin-bottom:6px;}
+.l-strip-label{font-size:11px;font-weight:500;letter-spacing:.05em;opacity:.8;text-transform:uppercase;}
+.l-features{max-width:1200px;margin:0 auto;padding:80px 5vw;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.l-feat{background:var(--surface);border-radius:20px;padding:28px 24px;border:1px solid var(--line);transition:transform .25s,box-shadow .25s;}
+.l-feat:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(28,30,46,.08);}
+.l-feat-ico{width:44px;height:44px;border-radius:13px;background:rgba(30,63,114,.08);display:flex;align-items:center;justify-content:center;color:var(--marian);margin-bottom:16px;}
+.l-feat-ico svg{width:22px;height:22px;}
+.l-feat h3{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:500;margin-bottom:8px;}
+.l-feat p{font-size:13.5px;line-height:1.6;color:var(--ink-soft);}
+.l-free{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:72px 5vw;}
+.l-free-inner{max-width:700px;margin:0 auto;text-align:center;}
+.l-free-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 15px;background:rgba(168,120,42,.1);border-radius:30px;font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:18px;}
+.l-free-h{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,2.8vw,42px);font-weight:400;margin-bottom:14px;}
+.l-free-h em{font-style:italic;color:var(--marian);}
+.l-free-p{font-size:14.5px;line-height:1.7;color:var(--ink-soft);max-width:480px;margin:0 auto 32px;}
+.l-free-items{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin-bottom:32px;}
+.l-free-item{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;}
+.l-free-check{width:21px;height:21px;border-radius:7px;background:var(--marian);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+.l-free-check svg{width:12px;height:12px;}
+.l-tests{padding:72px 5vw;max-width:1200px;margin:0 auto;}
+.l-test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.l-test{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:26px 22px;}
+.l-test-stars{color:var(--gold);font-size:12px;margin-bottom:12px;letter-spacing:2px;}
+.l-test-q{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;line-height:1.55;margin-bottom:14px;}
+.l-test-author{font-size:12px;color:var(--ink-faint);font-weight:500;}
+.l-footer{background:var(--ink);color:rgba(255,255,255,.6);padding:48px 5vw 32px;text-align:center;}
+.l-footer-logo{font-family:'Cormorant Garamond',serif;font-size:24px;color:#fff;font-weight:500;letter-spacing:.06em;margin-bottom:8px;}
+.l-footer-sub{font-size:13px;max-width:360px;margin:0 auto 20px;line-height:1.6;}
+.l-footer-links{display:flex;justify-content:center;gap:22px;font-size:13px;margin-bottom:24px;}
+.l-footer-links a{color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s;}
+.l-footer-links a:hover{color:#fff;}
+.l-footer-copy{font-size:12px;color:rgba(255,255,255,.3);border-top:1px solid rgba(255,255,255,.1);padding-top:20px;}
+
+/* ═══════════════════════════════════════
+   APP OVERLAY
+═══════════════════════════════════════ */
+#app-overlay{
+  position:fixed;inset:0;z-index:200;
+  display:none;
+  background:var(--bg);
+  transition:opacity .35s;
+}
+#app-overlay.entering{animation:appIn .4s cubic-bezier(.2,.85,.3,1);}
+@keyframes appIn{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:scale(1);}}
+.app-back-bar{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:440px;z-index:250;
+  display:flex;align-items:center;gap:10px;
+  padding:max(14px,env(safe-area-inset-top)) 18px 10px;
+  background:rgba(245,243,238,.85);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line-soft);
+}
+[data-theme="dark"] .app-back-bar{background:rgba(12,16,32,.85);}
+.app-back-btn{
+  display:flex;align-items:center;gap:6px;background:none;border:none;
+  color:var(--marian);font-size:13px;font-weight:500;cursor:pointer;
+  font-family:'Inter',sans-serif;
+}
+.app-back-btn svg{width:16px;height:16px;}
+.app-back-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;flex:1;text-align:center;}
+.app-theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);}
+.app-theme-btn svg{width:16px;height:16px;}
+
+/* ═══════════════════════════════════════
+   APP — CONTAINER & SCREENS
+═══════════════════════════════════════ */
+.app-wrap{
+  max-width:440px;margin:0 auto;height:100vh;height:100dvh;
+  position:relative;overflow:hidden;
+  background:radial-gradient(120% 80% at 50% -10%,var(--bg) 0%,transparent 55%),var(--bg);
+}
+.app-screen{display:none;height:100%;overflow-y:auto;overflow-x:hidden;padding-bottom:96px;-webkit-overflow-scrolling:touch;}
+.app-screen.active{display:block;animation:fadeUp .4s cubic-bezier(.22,.9,.3,1);}
+.app-screen::-webkit-scrollbar{width:0;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ═══════════════════════════════════════
+   APP — TOP BAR
+═══════════════════════════════════════ */
+.a-topbar{display:flex;justify-content:space-between;align-items:center;padding:max(60px,env(safe-area-inset-top)) 22px 8px;}
+.a-brand{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;letter-spacing:.05em;display:flex;align-items:center;gap:8px;}
+.a-brand .mark{color:var(--gold);font-size:16px;}
+
+/* ═══════════════════════════════════════
+   APP — TYPOGRAPHY
+═══════════════════════════════════════ */
+.a-eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);}
+.a-hdr{padding:max(58px,env(safe-area-inset-top)) 24px 18px;}
+.a-hdr-title{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;line-height:1.08;}
+.a-hdr-sub{font-size:13px;color:var(--ink-soft);margin-top:4px;font-weight:300;}
+
+/* ═══════════════════════════════════════
+   APP — HOME ELEMENTS
+═══════════════════════════════════════ */
+.a-greet{padding:14px 24px 10px;}
+.a-greet-date{font-size:12px;color:var(--gold);font-weight:500;letter-spacing:.05em;text-transform:capitalize;margin-bottom:5px;}
+.a-greet-name{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;line-height:1.1;}
+.a-greet-lit{font-size:12px;color:var(--ink-soft);margin-top:7px;display:flex;align-items:center;gap:7px;}
+.a-lit-dot{width:9px;height:9px;border-radius:50%;}
+.a-streak{display:flex;gap:10px;padding:14px 20px 6px;overflow-x:auto;scrollbar-width:none;}
+.a-streak::-webkit-scrollbar{display:none;}
+.a-chip{flex-shrink:0;background:var(--surface);border:1px solid var(--line-soft);border-radius:16px;padding:12px 15px;min-width:90px;box-shadow:var(--shadow);}
+.a-chip .v{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:500;line-height:1;color:var(--marian);}
+.a-chip .v small{font-size:13px;color:var(--ink-faint);}
+.a-chip .l{font-size:10px;color:var(--ink-soft);margin-top:5px;letter-spacing:.03em;}
+.a-chip.gold .v{color:var(--gold);}
+.a-sec{padding:20px 20px 4px;}
+.a-sec-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 12px;}
+.a-sec-title{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:500;}
+.a-sec-link{font-size:12px;color:var(--marian);font-weight:500;cursor:pointer;}
+.a-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);box-shadow:var(--shadow);}
+.a-card-pad{padding:20px 22px;}
+.a-tap:active{transform:scale(.98);}
+.a-feature-card{padding:22px;overflow:hidden;}
+.a-feature-card .tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.a-feature-card .tag::before{content:'';width:13px;height:1px;background:var(--gold);opacity:.6;}
+.a-gospel-txt{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;line-height:1.55;}
+.a-pill-row{display:flex;gap:8px;margin-top:16px;}
+.a-pill{font-size:12px;font-weight:500;padding:9px 15px;border-radius:30px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;}
+.a-pill.primary{background:var(--marian);color:#fff;border-color:var(--marian);}
+.a-quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:8px 20px 4px;}
+.a-quick{background:var(--surface);border:1px solid var(--line-soft);border-radius:16px;padding:13px 7px 11px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s,border-color .2s;}
+.a-quick:active{transform:scale(.93);border-color:var(--gold-soft);}
+.a-quick .qi svg{width:22px;height:22px;color:var(--marian);}
+.a-quick .ql{font-size:10px;color:var(--ink-soft);font-weight:500;text-align:center;line-height:1.15;}
+.a-saint-row{display:flex;gap:14px;align-items:center;}
+.a-saint-portrait{width:60px;height:60px;border-radius:15px;flex-shrink:0;background:linear-gradient(160deg,var(--marian),var(--marian-soft));display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:var(--shadow);}
+.a-saint-portrait svg{width:30px;height:30px;}
+.a-saint-info .n{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;line-height:1.1;}
+.a-saint-info .d{font-size:12px;color:var(--ink-soft);margin-top:4px;line-height:1.45;}
+.a-quote-card{padding:24px;text-align:center;background:linear-gradient(160deg,var(--surface),var(--surface-2));}
+.a-quote-mark{font-family:'Cormorant Garamond',serif;font-size:44px;color:var(--gold-soft);line-height:.5;height:22px;}
+.a-quote-text{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:300;font-style:italic;line-height:1.55;margin:8px 0 12px;}
+.a-quote-attr{font-size:11.5px;color:var(--ink-faint);}
+.a-intention-card{display:flex;gap:13px;align-items:flex-start;padding:18px 20px;}
+.a-int-icon{color:var(--gold);flex-shrink:0;margin-top:2px;}
+.a-int-icon svg{width:20px;height:20px;}
+.a-int-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.a-int-text{font-size:13.5px;line-height:1.5;}
+.a-ring-wrap{display:flex;align-items:center;gap:16px;}
+.a-ring{position:relative;width:70px;height:70px;flex-shrink:0;}
+.a-ring svg{transform:rotate(-90deg);}
+.a-ring-track{stroke:var(--surface-2);}
+.a-ring-fill{stroke:var(--gold);stroke-linecap:round;}
+.a-ring-lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.a-ring-lbl .rv{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--marian);line-height:1;}
+.a-ring-lbl .rt{font-size:8px;color:var(--ink-faint);}
+
+/* ═══════════════════════════════════════
+   APP — BOTTOM NAV
+═══════════════════════════════════════ */
+.a-nav{position:absolute;bottom:0;left:0;right:0;background:var(--surface-glass);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:50;}
+.a-nav-btn{flex:1;padding:11px 0 9px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink-faint);transition:color .25s;}
+.a-nav-btn.active{color:var(--marian);}
+.a-nav-btn svg{width:22px;height:22px;transition:transform .25s;}
+.a-nav-btn.active svg{transform:translateY(-1px);}
+.a-nav-label{font-size:9.5px;font-weight:600;letter-spacing:.02em;}
+
+/* ═══════════════════════════════════════
+   APP — LIST ITEMS, CATS, MISC
+═══════════════════════════════════════ */
+.a-list{padding:0 20px;}
+.a-li{background:var(--surface);border:1px solid var(--line-soft);border-radius:15px;padding:15px 17px;margin-bottom:10px;display:flex;align-items:center;gap:13px;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s,border-color .2s;}
+.a-li:active{transform:scale(.98);border-color:var(--gold-soft);}
+.a-li-ico{width:36px;height:36px;border-radius:11px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--marian);flex-shrink:0;font-size:17px;}
+.a-li-ico svg{width:18px;height:18px;}
+.a-li-body{flex:1;min-width:0;}
+.a-li-t{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:500;line-height:1.2;}
+.a-li-s{font-size:11px;color:var(--ink-soft);margin-top:2px;line-height:1.35;}
+.a-li-arr{color:var(--ink-faint);font-size:19px;flex-shrink:0;}
+.a-cats{display:flex;gap:8px;padding:2px 20px 15px;overflow-x:auto;scrollbar-width:none;}
+.a-cats::-webkit-scrollbar{display:none;}
+.a-cat{flex-shrink:0;padding:7px 15px;border-radius:22px;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);}
+.a-cat.active{background:var(--marian);color:#fff;border-color:var(--marian);}
+.a-list-eyebrow{padding:13px 24px 8px;font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.1em;}
+.a-divider{height:1px;background:var(--line-soft);margin:16px 24px;}
+.a-spacer{height:8px;}
+
+/* ═══════════════════════════════════════
+   APP — OVERLAYS
+═══════════════════════════════════════ */
+.a-over{position:absolute;inset:0;z-index:130;display:none;flex-direction:column;background:var(--bg);}
+.a-over.on{display:flex;animation:slideIn .38s cubic-bezier(.2,.85,.3,1);}
+@keyframes slideIn{from{transform:translateX(8%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.a-over-bar{display:flex;align-items:center;gap:13px;padding:max(50px,env(safe-area-inset-top)) 18px 13px;background:var(--surface-glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line-soft);position:sticky;top:0;z-index:5;}
+.a-over-back{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);flex-shrink:0;}
+.a-over-back svg{width:17px;height:17px;}
+.a-over-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.a-over-scroll{flex:1;overflow-y:auto;padding:22px 22px 56px;}
+.a-over-scroll::-webkit-scrollbar{width:0;}
+.a-rd-sub{font-size:12px;color:var(--ink-faint);margin-bottom:5px;}
+.a-rd-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;line-height:1.1;margin-bottom:5px;}
+.a-rd-meta{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 20px;}
+.a-meta-tag{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--line-soft);}
+.a-rd-body{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;line-height:1.8;}
+.a-rd-body p{margin-bottom:4px;}
+.a-rd-note{background:var(--surface);border:1px solid var(--line-soft);border-left:3px solid var(--gold);border-radius:12px;padding:14px 16px;margin:20px 0;}
+.a-rd-note .nt{font-size:10px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.a-rd-note .nb{font-family:'Inter',sans-serif;font-size:13px;line-height:1.55;color:var(--ink-soft);}
+.a-icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);}
+.a-icon-btn svg{width:17px;height:17px;}
+
+/* ═══════════════════════════════════════
+   APP — TERÇO
+═══════════════════════════════════════ */
+.a-mystery-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.a-myb{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;padding:14px;cursor:pointer;text-align:left;transition:all .2s;box-shadow:var(--shadow);}
+.a-myb.active{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 7%,var(--surface));}
+.a-myb .mn{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;display:block;}
+.a-myb .md{font-size:10px;color:var(--ink-faint);margin-top:2px;}
+.a-intention-input{width:100%;padding:13px 15px;border-radius:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:'Inter',sans-serif;font-size:13.5px;margin-bottom:14px;resize:none;}
+.a-intention-input:focus{outline:none;border-color:var(--marian);}
+.a-rosary-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-lg);}
+.a-rosary-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;}
+.a-rosary-pname{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;}
+.a-rosary-step{font-size:11px;color:var(--ink-faint);}
+.a-rosary-mys{font-family:'Cormorant Garamond',serif;font-size:13.5px;font-style:italic;color:var(--marian);margin-bottom:14px;}
+.a-mystery-illus{height:140px;border-radius:16px;margin-bottom:16px;overflow:hidden;}
+.a-mystery-illus svg{width:100%;height:100%;display:block;}
+.a-beads{display:flex;justify-content:center;gap:5px;margin-bottom:16px;flex-wrap:wrap;max-width:320px;margin-left:auto;margin-right:auto;}
+.a-bead{width:20px;height:20px;border-radius:50%;background:var(--surface-2);border:1.5px solid var(--line);transition:all .35s cubic-bezier(.2,.9,.3,1);}
+.a-bead.lg{width:26px;height:26px;}
+.a-bead.done{background:var(--gold);border-color:var(--gold);}
+.a-bead.cur{border-color:var(--marian);background:color-mix(in srgb,var(--marian) 14%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--marian) 14%,transparent);transform:scale(1.14);}
+.a-prayer-read{background:var(--bg);border:1px solid var(--line-soft);border-radius:13px;padding:18px;margin-bottom:16px;min-height:110px;display:flex;align-items:center;}
+.a-prayer-read-txt{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;line-height:1.7;text-align:center;width:100%;}
+.a-btn{width:100%;padding:15px;border:none;border-radius:13px;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:600;cursor:pointer;transition:transform .15s,opacity .2s;letter-spacing:.01em;}
+.a-btn:active{transform:scale(.97);}
+.a-btn-primary{background:var(--marian);color:#fff;}
+.a-btn-gold{background:var(--gold);color:#fff;}
+.a-btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line);}
+.a-btn-row{display:flex;gap:10px;margin-top:10px;}
+.a-btn-row .a-btn{padding:12px;font-size:13px;}
+.a-back-link{display:inline-flex;align-items:center;gap:6px;color:var(--marian);font-size:13px;font-weight:500;cursor:pointer;background:none;border:none;margin-bottom:16px;font-family:'Inter',sans-serif;}
+.a-complete{text-align:center;padding:46px 28px;}
+.a-complete-glyph{font-family:'Cormorant Garamond',serif;font-size:56px;color:var(--gold);line-height:1;margin-bottom:16px;animation:rise .8s ease;}
+@keyframes rise{from{opacity:0;transform:translateY(12px) scale(.9);}to{opacity:1;transform:translateY(0) scale(1);}}
+.a-complete-t{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;margin-bottom:10px;}
+.a-complete-s{font-size:13.5px;color:var(--ink-soft);line-height:1.6;max-width:260px;margin:0 auto 24px;}
+
+/* ═══════════════════════════════════════
+   APP — EXAME
+═══════════════════════════════════════ */
+.a-exam-intro{font-size:13.5px;color:var(--ink-soft);line-height:1.6;padding:0 4px 16px;}
+.a-exam-cmd{background:var(--surface);border:1px solid var(--line-soft);border-radius:15px;margin-bottom:11px;overflow:hidden;box-shadow:var(--shadow);}
+.a-exam-cmd-head{padding:15px 17px;cursor:pointer;display:flex;align-items:center;gap:11px;}
+.a-exam-num{width:28px;height:28px;border-radius:9px;background:var(--surface-2);color:var(--marian);font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.a-exam-t{flex:1;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:500;line-height:1.2;}
+.a-exam-cnt{font-size:10.5px;color:var(--gold);font-weight:600;}
+.a-exam-body{display:none;padding:0 17px 13px;}
+.a-exam-cmd.open .a-exam-body{display:block;}
+.a-exam-q{display:flex;gap:11px;padding:10px 0;border-top:1px solid var(--line-soft);cursor:pointer;align-items:flex-start;}
+.a-exam-check{width:20px;height:20px;border-radius:7px;border:1.5px solid var(--line);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.a-exam-q.on .a-exam-check{background:var(--rose);border-color:var(--rose);}
+.a-exam-check svg{width:12px;height:12px;color:#fff;opacity:0;transition:opacity .2s;}
+.a-exam-q.on .a-exam-check svg{opacity:1;}
+.a-exam-q-txt{font-size:13px;line-height:1.45;color:var(--ink-soft);}
+.a-exam-q.on .a-exam-q-txt{color:var(--ink);}
+.a-exam-summary{background:linear-gradient(160deg,var(--surface),var(--surface-2));border:1px solid var(--gold-soft);border-radius:17px;padding:20px;margin-top:8px;}
+
+/* ═══════════════════════════════════════
+   APP — IA
+═══════════════════════════════════════ */
+.a-ia-wrap{display:flex;flex-direction:column;height:100%;}
+.a-ia-scroll{flex:1;overflow-y:auto;padding:16px 16px 10px;}
+.a-ia-scroll::-webkit-scrollbar{width:0;}
+.a-ia-welcome{text-align:center;padding:36px 22px;}
+.a-ia-glyph{width:60px;height:60px;border-radius:18px;margin:0 auto 16px;background:linear-gradient(160deg,var(--marian),var(--gold));display:flex;align-items:center;justify-content:center;}
+.a-ia-glyph svg{width:30px;height:30px;color:#fff;}
+.a-ia-welcome h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;margin-bottom:7px;}
+.a-ia-welcome p{font-size:13px;color:var(--ink-soft);line-height:1.55;max-width:280px;margin:0 auto 20px;}
+.a-ia-suggests{display:flex;flex-direction:column;gap:8px;}
+.a-ia-sug{background:var(--surface);border:1px solid var(--line-soft);border-radius:13px;padding:12px 14px;font-size:13px;color:var(--ink);text-align:left;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);}
+.a-ia-sug:active{transform:scale(.98);border-color:var(--gold-soft);}
+.a-msg{margin-bottom:12px;display:flex;}
+.a-msg.user{justify-content:flex-end;}
+.a-bubble{max-width:84%;padding:12px 15px;border-radius:17px;font-size:13.5px;line-height:1.55;}
+.a-msg.user .a-bubble{background:var(--marian);color:#fff;border-bottom-right-radius:4px;}
+.a-msg.ai .a-bubble{background:var(--surface);border:1px solid var(--line-soft);border-bottom-left-radius:4px;box-shadow:var(--shadow);}
+.a-msg.ai .a-bubble .src{display:block;margin-top:9px;padding-top:9px;border-top:1px solid var(--line-soft);font-size:10.5px;color:var(--gold);}
+.a-ia-typing{display:flex;gap:5px;padding:4px 2px;}
+.a-ia-typing span{width:6px;height:6px;border-radius:50%;background:var(--marian-soft);animation:blink 1.3s infinite;}
+.a-ia-typing span:nth-child(2){animation-delay:.2s;}
+.a-ia-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,60%,100%{opacity:.25;}30%{opacity:1;}}
+.a-ia-input-bar{padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line-soft);display:flex;gap:9px;align-items:flex-end;background:var(--surface-glass);backdrop-filter:blur(18px);}
+.a-ia-input{flex:1;max-height:100px;padding:11px 14px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:'Inter',sans-serif;font-size:13.5px;resize:none;line-height:1.4;}
+.a-ia-input:focus{outline:none;border-color:var(--marian);}
+.a-ia-send{width:42px;height:42px;border-radius:50%;border:none;background:var(--marian);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .15s;}
+.a-ia-send:active{transform:scale(.9);}
+.a-ia-send:disabled{opacity:.4;}
+.a-ia-disc{font-size:10px;color:var(--ink-faint);text-align:center;padding:0 16px 5px;}
+
+/* ═══════════════════════════════════════
+   APP — CATECISMO / FÉ
+═══════════════════════════════════════ */
+.a-fe-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;margin:0 20px 12px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);}
+.a-fe-head{padding:16px 18px;display:flex;justify-content:space-between;align-items:center;}
+.a-fe-eyebrow{font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:3px;}
+.a-fe-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;}
+.a-fe-chevron{color:var(--ink-faint);transition:transform .3s;font-size:17px;}
+.a-fe-card.exp .a-fe-chevron{transform:rotate(180deg);}
+.a-fe-body{display:none;padding:0 18px 16px;border-top:1px solid var(--line-soft);}
+.a-fe-card.exp .a-fe-body{display:block;}
+.a-fe-item{padding:10px 0;border-bottom:1px solid var(--line-soft);display:flex;gap:12px;align-items:flex-start;}
+.a-fe-item:last-child{border-bottom:none;}
+.a-fe-num{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold);font-style:italic;min-width:22px;line-height:1.4;}
+.a-fe-text{font-size:13.5px;color:var(--ink-soft);line-height:1.5;padding-top:2px;}
+.a-fe-text strong{color:var(--ink);font-weight:500;}
+
+/* ═══════════════════════════════════════
+   APP — PERFIL / BADGES
+═══════════════════════════════════════ */
+.a-badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;padding:0 20px;}
+.a-badge{background:var(--surface);border:1px solid var(--line-soft);border-radius:15px;padding:14px 7px;text-align:center;box-shadow:var(--shadow);}
+.a-badge.locked{opacity:.4;}
+.a-badge-ico{font-size:26px;margin-bottom:7px;}
+.a-badge-name{font-size:10.5px;font-weight:600;line-height:1.2;}
+.a-badge-desc{font-size:9px;color:var(--ink-faint);margin-top:2px;}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.a-toast{position:absolute;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:28px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;z-index:300;pointer-events:none;box-shadow:var(--shadow-lg);}
+.a-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ═══════════════════════════════════════
+   AUTH MODAL
+═══════════════════════════════════════ */
+.auth-modal{
+  position:fixed;inset:0;z-index:250;
+  background:var(--bg);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;
+}
+.auth-modal.on{display:flex;}
+.auth-box{width:100%;max-width:380px;}
+.auth-logo{text-align:center;margin-bottom:32px;}
+.auth-logo-mark{font-family:'Cormorant Garamond',serif;font-size:48px;color:var(--gold);}
+.auth-logo-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;letter-spacing:.06em;margin-top:4px;}
+.auth-logo-sub{font-size:13px;color:var(--ink-soft);margin-top:4px;}
+.auth-tabs{display:flex;background:var(--surface-2);border-radius:12px;padding:4px;margin-bottom:22px;}
+.auth-tab{flex:1;padding:9px;border:none;border-radius:9px;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;background:transparent;color:var(--ink-soft);transition:all .2s;}
+.auth-tab.active{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px rgba(28,30,46,.08);}
+.auth-field{width:100%;padding:14px 16px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;margin-bottom:12px;transition:border-color .2s;outline:none;}
+.auth-field:focus{border-color:var(--marian);}
+.auth-field::placeholder{color:var(--ink-faint);}
+.auth-submit{width:100%;padding:15px;background:var(--marian);color:#fff;border:none;border-radius:13px;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;margin-bottom:12px;transition:all .25s;letter-spacing:.01em;}
+.auth-submit:hover{background:var(--marian-2);transform:translateY(-1px);}
+.auth-submit:disabled{opacity:.5;transform:none;cursor:default;}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:8px 0 12px;}
+.auth-divider span{font-size:12px;color:var(--ink-faint);}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line);}
+.auth-guest{width:100%;padding:13px;background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);border-radius:13px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;}
+.auth-guest:hover{border-color:var(--ink-soft);color:var(--ink);}
+.auth-error{font-size:12px;color:#c0392b;text-align:center;margin-bottom:10px;min-height:18px;}
+.auth-success{font-size:12px;color:var(--green);text-align:center;margin-bottom:10px;min-height:18px;}
+.auth-note{font-size:11px;color:var(--ink-faint);text-align:center;margin-top:14px;line-height:1.5;}
+.user-badge{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface-2);border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--line-soft);}
+.user-badge-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+
+@media(max-width:900px){
+  .l-hero{grid-template-columns:1fr;gap:36px;padding-top:calc(68px + 36px);text-align:center;}
+  .l-text{padding:0;}
+  .l-p,.l-experiment{max-width:480px;margin-left:auto;margin-right:auto;}
+  .l-btns{justify-content:center;}
+  .l-note{justify-content:center;}
+  .l-phones{height:300px;order:-1;}
+  .l-features{grid-template-columns:1fr;}
+  .l-test-grid{grid-template-columns:1fr;}
+  .l-nav-links{display:none;}
+  .l-strip{gap:28px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     LANDING PAGE
+═══════════════════════════════════════════════ -->
+<div id="landing-view">
+
+  <!-- NAV -->
+  <nav class="l-nav">
+    <a href="#" class="l-nav-logo"><span class="l-nav-cross">✦</span> Sanctus</a>
+    <div class="l-nav-links">
+      <a href="#l-features">Funcionalidades</a>
+      <a href="#l-free">Gratuito</a>
+      <a href="#l-sobre">Sobre</a>
+    </div>
+    <button class="l-nav-cta" onclick="enterApp()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
+      Experimentar
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="l-hero">
+
+    <!-- PHONES -->
+    <div class="l-phones">
+      <div class="l-phone-back">
+        <svg width="196" height="392" viewBox="0 0 196 392" fill="none">
+          <rect x="2" y="2" width="192" height="388" rx="26" fill="#0D1B38" stroke="#2A3F6A" stroke-width="1.5"/>
+          <rect x="9" y="9" width="178" height="374" rx="20" fill="#0E1528"/>
+          <rect x="66" y="14" width="64" height="11" rx="5.5" fill="#0D1B38"/>
+          <text x="22" y="48" font-family="Georgia,serif" font-size="13" fill="#C9A96B" letter-spacing="2">✦ SANCTUS</text>
+          <rect x="16" y="58" width="164" height="68" rx="13" fill="#151F3A"/>
+          <rect x="16" y="58" width="164" height="68" rx="13" stroke="#C9A96B" stroke-width=".5" stroke-opacity=".3"/>
+          <text x="26" y="77" font-family="Arial" font-size="7" fill="#C9A96B">SEGUNDA · TEMPO COMUM</text>
+          <text x="26" y="93" font-family="Georgia,serif" font-size="12" fill="#ECE9E0" font-style="italic">A paz esteja</text>
+          <text x="26" y="107" font-family="Georgia,serif" font-size="12" fill="#ECE9E0" font-style="italic">convosco.</text>
+          <rect x="16" y="136" width="46" height="36" rx="10" fill="#151F3A"/>
+          <text x="26" y="150" font-family="Georgia,serif" font-size="11" fill="#7D9ED1">12</text>
+          <text x="22" y="163" font-family="Arial" font-size="6" fill="#626B86">dias seguidos</text>
+          <rect x="68" y="136" width="46" height="36" rx="10" fill="#151F3A"/>
+          <text x="78" y="150" font-family="Georgia,serif" font-size="11" fill="#7D9ED1">34</text>
+          <text x="72" y="163" font-family="Arial" font-size="6" fill="#626B86">terços rezados</text>
+          <rect x="120" y="136" width="60" height="36" rx="10" fill="#151F3A"/>
+          <text x="128" y="150" font-family="Georgia,serif" font-size="11" fill="#C9A96B">187</text>
+          <text x="129" y="163" font-family="Arial" font-size="6" fill="#626B86">orações</text>
+          <rect x="16" y="182" width="164" height="86" rx="13" fill="#151F3A"/>
+          <text x="26" y="200" font-family="Arial" font-size="7" fill="#C9A96B" letter-spacing="1">EVANGELHO DE HOJE</text>
+          <text x="26" y="216" font-family="Georgia,serif" font-size="9" fill="#ECE9E0">"Não julgueis, para não</text>
+          <text x="26" y="230" font-family="Georgia,serif" font-size="9" fill="#ECE9E0">serdes julgados; pois</text>
+          <text x="26" y="244" font-family="Georgia,serif" font-size="9" fill="#ECE9E0">com o critério…"</text>
+          <text x="26" y="258" font-family="Arial" font-size="7" fill="#5A7BAD">Mt 7, 1-5 · Ler completo ›</text>
+          <rect x="16" y="278" width="34" height="34" rx="10" fill="#151F3A"/>
+          <text x="27" y="300" font-size="12">📿</text>
+          <rect x="56" y="278" width="34" height="34" rx="10" fill="#151F3A"/>
+          <text x="67" y="300" font-size="12">🙏</text>
+          <rect x="96" y="278" width="34" height="34" rx="10" fill="#151F3A"/>
+          <text x="107" y="300" font-size="12">📖</text>
+          <rect x="136" y="278" width="46" height="34" rx="10" fill="#151F3A"/>
+          <text x="145" y="300" font-size="12">✨</text>
+          <rect x="9" y="344" width="178" height="39" fill="#151F3A"/>
+          <rect x="9" y="344" width="178" height="1" fill="#2A3F6A"/>
+          <circle cx="44" cy="364" r="3" fill="#7D9ED1"/>
+          <circle cx="78" cy="364" r="3" fill="#2A3F6A"/>
+          <circle cx="118" cy="364" r="3" fill="#2A3F6A"/>
+          <circle cx="152" cy="364" r="3" fill="#2A3F6A"/>
+        </svg>
+      </div>
+      <div class="l-phone-front">
+        <svg width="196" height="392" viewBox="0 0 196 392" fill="none">
+          <rect x="2" y="2" width="192" height="388" rx="26" fill="#0D1B38" stroke="#2A3F6A" stroke-width="1.5"/>
+          <rect x="9" y="9" width="178" height="374" rx="20" fill="#0E1528"/>
+          <rect x="66" y="14" width="64" height="11" rx="5.5" fill="#0D1B38"/>
+          <text x="17" y="47" font-family="Georgia,serif" font-size="11" fill="#ECE9E0">Santo Terço</text>
+          <rect x="16" y="56" width="164" height="88" rx="12" fill="#1A2845"/>
+          <circle cx="98" cy="100" r="21" fill="none" stroke="#C9A96B" stroke-width="1.2" opacity=".7"/>
+          <line x1="98" y1="79" x2="98" y2="121" stroke="#C9A96B" stroke-width="1.8" stroke-linecap="round" opacity=".85"/>
+          <line x1="77" y1="100" x2="119" y2="100" stroke="#C9A96B" stroke-width="1.8" stroke-linecap="round" opacity=".85"/>
+          <text x="26" y="74" font-family="Georgia,serif" font-size="7" fill="#C9A96B" font-style="italic">Mistérios Gozosos</text>
+          <text x="26" y="135" font-family="Georgia,serif" font-size="7" fill="#5A7BAD" font-style="italic">1º Mistério: A Anunciação</text>
+          <circle cx="24" cy="160" r="6" fill="#C9A96B"/>
+          <circle cx="40" cy="160" r="4.5" fill="#1C2845"/>
+          <circle cx="54" cy="160" r="4.5" fill="#C9A96B"/>
+          <circle cx="68" cy="160" r="4.5" fill="#C9A96B"/>
+          <circle cx="82" cy="160" r="4.5" fill="#7D9ED1" opacity=".5"/>
+          <circle cx="96" cy="160" r="4.5" fill="#1C2845"/>
+          <circle cx="110" cy="160" r="4.5" fill="#1C2845"/>
+          <circle cx="124" cy="160" r="4.5" fill="#1C2845"/>
+          <circle cx="138" cy="160" r="4.5" fill="#1C2845"/>
+          <circle cx="152" cy="160" r="4.5" fill="#1C2845"/>
+          <circle cx="166" cy="160" r="4.5" fill="#1C2845"/>
+          <circle cx="180" cy="160" r="6" fill="#1C2845"/>
+          <rect x="16" y="173" width="164" height="86" rx="12" fill="#0A1020"/>
+          <text x="26" y="194" font-family="Georgia,serif" font-size="9" fill="#ECE9E0" font-style="italic">3ª Ave Maria</text>
+          <text x="26" y="210" font-family="Georgia,serif" font-size="8" fill="#A6ADC0">Ave Maria, cheia de graça,</text>
+          <text x="26" y="224" font-family="Georgia,serif" font-size="8" fill="#A6ADC0">o Senhor é convosco…</text>
+          <rect x="16" y="270" width="164" height="38" rx="11" fill="#C9A96B"/>
+          <text x="98" y="294" font-family="Arial" font-size="11" fill="#0E1528" text-anchor="middle" font-weight="700">✓ Rezado</text>
+          <text x="98" y="328" font-family="Arial" font-size="8" fill="#5A7BAD" text-anchor="middle">Dezena 1/5 · Ave 3 de 10</text>
+          <rect x="9" y="344" width="178" height="39" fill="#151F3A"/>
+          <rect x="9" y="344" width="178" height="1" fill="#2A3F6A"/>
+          <circle cx="44" cy="364" r="3" fill="#2A3F6A"/>
+          <circle cx="78" cy="364" r="3" fill="#C9A96B"/>
+          <circle cx="118" cy="364" r="3" fill="#2A3F6A"/>
+          <circle cx="152" cy="364" r="3" fill="#2A3F6A"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- TEXT -->
+    <div class="l-text">
+      <div class="l-eyebrow">Aplicativo Católico</div>
+      <h1 class="l-h1">Sanctus: orações, terços,<br><em>liturgia, santos</em><br>e muito mais.</h1>
+      <p class="l-p">O Sanctus é um apostolado digital que nasceu para ajudar almas a rezarem com constância, profundidade e fidelidade ao Magistério. Orações, novenas, exame de consciência, Bíblia, Catecismo e uma IA Católica. Tudo num só lugar — gratuito e sem distrações.</p>
+      <div class="l-btns">
+        <button class="l-btn-primary">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M3.18 23.76c.3.17.64.24.98.2l13.2-12.07-2.8-2.8-11.38 14.67zm16.28-9.46L16.94 16l2.53 1.46c.91.52.91 1.37 0 1.89l-2.53 1.46 2.52 2.52c1.77-1.02 2.79-2.68 2.79-4.42s-1.02-3.4-2.79-4.61z"/></svg>
+          Baixar na Google Play
+        </button>
+        <button class="l-btn-secondary">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          App Store (em breve)
+        </button>
+      </div>
+      <div class="l-note">Gratuito, sem anúncios, sustentado pela generosidade dos fiéis.</div>
+      <!-- EXPERIMENT BUTTON -->
+      <div class="l-experiment" onclick="enterApp()">
+        <div class="l-exp-icon">▶</div>
+        <div class="l-exp-text">
+          <div class="t">Experimentar o app agora</div>
+          <div class="s">Abrir o Sanctus direto no navegador</div>
+        </div>
+        <span class="l-exp-arrow">›</span>
+      </div>
+    </div>
+
+    <!-- CAROUSEL -->
+    <div class="l-carousel">
+      <div class="l-track">
+        <div class="l-card active" id="lc-0">
+          <svg class="l-card-svg" viewBox="0 0 340 240" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="lg1" cx="30%" cy="30%"><stop offset="0%" stop-color="#2C5499"/><stop offset="100%" stop-color="#0D1B38"/></radialGradient></defs><rect width="340" height="240" fill="url(#lg1)"/><circle cx="280" cy="40" r="100" fill="#C9A96B" opacity=".06"/><circle cx="60" cy="200" r="80" fill="#C9A96B" opacity=".05"/><path d="M130 180 Q150 120 170 100 Q190 120 210 180" stroke="#C9A96B" stroke-width="1.5" fill="none" opacity=".4"/><circle cx="170" cy="88" r="16" fill="none" stroke="#C9A96B" stroke-width="1.4" opacity=".7"/><line x1="170" y1="72" x2="170" y2="104" stroke="#C9A96B" stroke-width="2" stroke-linecap="round" opacity=".8"/><line x1="154" y1="88" x2="186" y2="88" stroke="#C9A96B" stroke-width="2" stroke-linecap="round" opacity=".8"/><circle cx="130" cy="162" r="5" fill="#C9A96B" opacity=".7"/><circle cx="136" cy="148" r="4" fill="rgba(255,255,255,.5)"/><circle cx="143" cy="138" r="4" fill="rgba(255,255,255,.5)"/><circle cx="151" cy="128" r="4" fill="rgba(255,255,255,.5)"/><circle cx="210" cy="162" r="5" fill="#C9A96B" opacity=".7"/><circle cx="204" cy="148" r="4" fill="rgba(255,255,255,.5)"/><circle cx="197" cy="138" r="4" fill="rgba(255,255,255,.5)"/><circle cx="189" cy="128" r="4" fill="rgba(255,255,255,.5)"/><text x="170" y="218" font-family="Georgia,serif" font-size="11" fill="rgba(255,255,255,.4)" text-anchor="middle" letter-spacing="3">✦ SANCTUS ✦</text></svg>
+          <div class="l-card-body"><div class="l-card-tag">Apostolado Gratuito</div><div class="l-card-title">Totalmente gratuito</div><div class="l-card-desc">Sem anúncios, sem cobranças, sem planos. O Sanctus é um apostolado sustentado apenas pela Providência e pela generosidade dos fiéis.</div></div>
+        </div>
+        <div class="l-card" id="lc-1">
+          <svg class="l-card-svg" viewBox="0 0 340 240" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="lg2" cx="70%" cy="20%"><stop offset="0%" stop-color="#3D5A3E"/><stop offset="100%" stop-color="#1A2C1B"/></radialGradient></defs><rect width="340" height="240" fill="url(#lg2)"/><rect x="100" y="55" width="140" height="110" rx="8" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)" stroke-width="1"/><line x1="170" y1="55" x2="170" y2="165" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/><line x1="116" y1="80" x2="162" y2="80" stroke="rgba(255,255,255,.25)" stroke-width="1"/><line x1="116" y1="92" x2="162" y2="92" stroke="rgba(255,255,255,.15)" stroke-width="1"/><line x1="116" y1="104" x2="155" y2="104" stroke="rgba(255,255,255,.15)" stroke-width="1"/><line x1="178" y1="80" x2="224" y2="80" stroke="rgba(255,255,255,.25)" stroke-width="1"/><line x1="178" y1="92" x2="220" y2="92" stroke="rgba(255,255,255,.15)" stroke-width="1"/><text x="170" y="210" font-family="Georgia,serif" font-size="13" fill="rgba(255,255,255,.65)" text-anchor="middle" font-style="italic">"No princípio era o Verbo"</text></svg>
+          <div class="l-card-body" style="background:#2C4226"><div class="l-card-tag">Bíblia &amp; Liturgia</div><div class="l-card-title">A Palavra todo dia</div><div class="l-card-desc">Evangelho e liturgia diária, Bíblia por testamento e temas, versículo aleatório e plano de leitura anual.</div></div>
+        </div>
+        <div class="l-card" id="lc-2">
+          <svg class="l-card-svg" viewBox="0 0 340 240" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="lg3" cx="40%" cy="60%"><stop offset="0%" stop-color="#5A3060"/><stop offset="100%" stop-color="#1A0D2E"/></radialGradient></defs><rect width="340" height="240" fill="url(#lg3)"/><circle cx="60" cy="60" r="120" fill="#9D88C4" opacity=".07"/><path d="M140 120 Q165 85 200 95 Q230 105 215 130 Q200 155 170 148 Q148 142 140 120Z" fill="rgba(255,255,255,.1)" stroke="rgba(255,255,255,.25)" stroke-width="1"/><circle cx="170" cy="118" r="4" fill="rgba(255,255,255,.5)"/><circle cx="100" cy="80" r="2" fill="#C9A96B" opacity=".8"/><circle cx="250" cy="60" r="1.5" fill="#C9A96B" opacity=".6"/><text x="170" y="218" font-family="Georgia,serif" font-size="11" fill="rgba(255,255,255,.4)" text-anchor="middle" letter-spacing="2">IA CATÓLICA</text></svg>
+          <div class="l-card-body" style="background:#3D2660"><div class="l-card-tag">Inteligência Artificial</div><div class="l-card-title">IA fiel ao Magistério</div><div class="l-card-desc">Tire dúvidas sobre doutrina, santos e Escritura. Cada resposta fundamentada no Catecismo e nos documentos papais.</div></div>
+        </div>
+        <div class="l-card" id="lc-3">
+          <svg class="l-card-svg" viewBox="0 0 340 240" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="lg4" cx="50%" cy="0%"><stop offset="0%" stop-color="#5A3020"/><stop offset="100%" stop-color="#1A0D08"/></radialGradient></defs><rect width="340" height="240" fill="url(#lg4)"/><rect x="158" y="110" width="24" height="80" rx="4" fill="rgba(201,169,107,.15)" stroke="rgba(201,169,107,.3)" stroke-width="1"/><path d="M170 110 Q162 98 166 86 Q170 78 174 86 Q178 98 170 110Z" fill="rgba(255,200,60,.7)"/><path d="M170 108 Q165 99 167 91 Q170 85 173 91 Q175 99 170 108Z" fill="rgba(255,240,100,.9)"/><ellipse cx="170" cy="110" rx="12" ry="6" fill="rgba(255,200,60,.25)"/></svg>
+          <div class="l-card-body" style="background:#4A2010"><div class="l-card-tag">Exame &amp; Confissão</div><div class="l-card-title">Preparação para os Sacramentos</div><div class="l-card-desc">Exame interativo pelos Dez Mandamentos que gera um roteiro personalizado para sua Confissão.</div></div>
+        </div>
+      </div>
+      <div class="l-controls">
+        <button class="l-dot active" id="ld-0" onclick="goLC(0)"></button>
+        <button class="l-dot" id="ld-1" onclick="goLC(1)"></button>
+        <button class="l-dot" id="ld-2" onclick="goLC(2)"></button>
+        <button class="l-dot" id="ld-3" onclick="goLC(3)"></button>
+        <button class="l-arrow" onclick="prevLC()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button>
+        <button class="l-arrow" onclick="nextLC()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- STRIP -->
+  <div class="l-strip">
+    <div><div class="l-strip-num">200+</div><div class="l-strip-label">Orações</div></div>
+    <div><div class="l-strip-num">4</div><div class="l-strip-label">Mistérios do Terço</div></div>
+    <div><div class="l-strip-num">30+</div><div class="l-strip-label">Novenas</div></div>
+    <div><div class="l-strip-num">100%</div><div class="l-strip-label">Gratuito</div></div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="l-features" id="l-features">
+    <div class="l-feat"><div class="l-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="4" r="1.6"/><circle cx="6.2" cy="7.5" r="1.4"/><circle cx="17.8" cy="7.5" r="1.4"/><path d="M12 16v5M10.5 21h3" stroke-linecap="round"/></svg></div><h3>Terço Guiado</h3><p>Mistérios automáticos por dia da semana, guia conta a conta com orações completas, campo de intenção e XP ao concluir.</p></div>
+    <div class="l-feat"><div class="l-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg></div><h3>Bíblia e Liturgia</h3><p>Evangelho e liturgia diária, Bíblia por testamento e temas, versículo aleatório e plano de leitura.</p></div>
+    <div class="l-feat"><div class="l-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><h3>Exame de Consciência</h3><p>Interativo pelos 10 Mandamentos. Gera automaticamente um roteiro para a Confissão.</p></div>
+    <div class="l-feat"><div class="l-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg></div><h3>IA Católica</h3><p>Cita o Catecismo, a Escritura e documentos do Magistério. Nunca inventa doutrina — e admite quando não tem certeza.</p></div>
+    <div class="l-feat"><div class="l-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3"/></svg></div><h3>Calendário Litúrgico</h3><p>Santo do dia, tempo litúrgico, cor da semana, solenidades e dias de abstinência — atualizado todo dia.</p></div>
+    <div class="l-feat"><div class="l-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg></div><h3>Gamificação Espiritual</h3><p>Sequência, XP, medalhas e metas diárias para perseverar na oração com constância e alegria.</p></div>
+  </section>
+
+  <!-- FREE -->
+  <section class="l-free" id="l-free">
+    <div class="l-free-inner">
+      <div class="l-free-badge">✦ Apostolado</div>
+      <h2 class="l-free-h">Um <em>apostolado</em>,<br>não um produto.</h2>
+      <p class="l-free-p">O Sanctus nasceu como um ato de serviço à Igreja, não como um negócio. Por isso é e permanecerá completamente gratuito.</p>
+      <div class="l-free-items">
+        <div class="l-free-item"><div class="l-free-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>Sem anúncios</div>
+        <div class="l-free-item"><div class="l-free-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>Sem planos pagos</div>
+        <div class="l-free-item"><div class="l-free-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>Sem cobranças</div>
+        <div class="l-free-item"><div class="l-free-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>Para sempre gratuito</div>
+      </div>
+      <button class="l-btn-primary" style="margin:0 auto" onclick="enterApp()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
+        Experimentar agora
+      </button>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="l-tests">
+    <div style="text-align:center;margin-bottom:40px">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(26px,2.8vw,38px);font-weight:400">O que os fiéis dizem</h2>
+    </div>
+    <div class="l-test-grid">
+      <div class="l-test"><div class="l-test-stars">★★★★★</div><div class="l-test-q">"O terço guiado me ajudou a rezar com mais atenção e constância do que nunca. O design é lindo."</div><div class="l-test-author">— Maria Fernanda, Belo Horizonte</div></div>
+      <div class="l-test"><div class="l-test-stars">★★★★★</div><div class="l-test-q">"O exame de consciência gera um roteiro real para a confissão. Já usei três vezes e foi transformador."</div><div class="l-test-author">— José Carlos, São Paulo</div></div>
+      <div class="l-test"><div class="l-test-stars">★★★★★</div><div class="l-test-q">"A IA Católica citou o Catecismo com número do parágrafo. Nunca vi isso em outro app. Incrível."</div><div class="l-test-author">— Padre Antônio, Goiânia</div></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="l-footer" id="l-sobre">
+    <div class="l-footer-logo">✦ Sanctus</div>
+    <div class="l-footer-sub">A vida espiritual católica num só lugar. Gratuito, fiel ao Magistério, para sempre.</div>
+    <div class="l-footer-links">
+      <a href="#">Privacidade</a>
+      <a href="#">Termos</a>
+      <a href="#">Contato</a>
+      <a href="#">Apoiar</a>
+    </div>
+    <div class="l-footer-copy">© 2025 Sanctus · Feito com fé · Todos os direitos reservados</div>
+  </footer>
+
+</div><!-- /landing -->
+
+<!-- ═══════════════════════════════════════════════
+     AUTH MODAL — Login / Cadastro
+═══════════════════════════════════════════════ -->
+<div class="auth-modal" id="auth-modal">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-mark">✦</div>
+      <div class="auth-logo-name">Sanctus</div>
+      <div class="auth-logo-sub">Entre para salvar seu progresso espiritual</div>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login"   onclick="switchTab('login')">Entrar</button>
+      <button class="auth-tab"        id="tab-signup"  onclick="switchTab('signup')">Criar conta</button>
+    </div>
+
+    <!-- ERRO / SUCESSO -->
+    <div class="auth-error"   id="auth-error"></div>
+    <div class="auth-success" id="auth-success" style="display:none"></div>
+
+    <!-- LOGIN -->
+    <div id="form-login">
+      <input class="auth-field" type="email"    id="login-email" placeholder="Seu e-mail" autocomplete="email"/>
+      <input class="auth-field" type="password" id="login-pass"  placeholder="Senha" autocomplete="current-password"/>
+      <button class="auth-submit" id="btn-login" onclick="doLogin()">Entrar</button>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="form-signup" style="display:none">
+      <div style="display:flex;gap:10px">
+        <input class="auth-field" type="text" id="signup-fname" placeholder="Nome" autocomplete="given-name"  style="margin-bottom:12px"/>
+        <input class="auth-field" type="text" id="signup-lname" placeholder="Sobrenome" autocomplete="family-name" style="margin-bottom:12px"/>
+      </div>
+      <input class="auth-field" type="email"    id="signup-email" placeholder="Seu e-mail" autocomplete="email"/>
+      <input class="auth-field" type="password" id="signup-pass"  placeholder="Senha (mín. 6 caracteres)" autocomplete="new-password"/>
+      <button class="auth-submit" id="btn-signup" onclick="doSignup()">Criar conta</button>
+    </div>
+
+    <div class="auth-divider"><span>ou</span></div>
+    <button class="auth-guest" onclick="doGuest()">Continuar sem conta</button>
+    <div class="auth-note">Sem conta, o progresso fica salvo apenas neste dispositivo.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     APP OVERLAY
+═══════════════════════════════════════════════ -->
+<div id="app-overlay">
+  <!-- Back bar -->
+  <div class="app-back-bar">
+    <button class="app-back-btn" onclick="exitApp()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      Voltar ao site
+    </button>
+    <div class="app-back-title">Sanctus</div>
+    <div id="a-user-badge" style="display:none" class="user-badge" onclick="showLogout()">
+      <span class="user-badge-dot"></span>
+      <span id="a-user-name">Fiel</span>
+    </div>
+    <button class="app-theme-btn" id="a-theme-btn-wrap" onclick="toggleTheme()" id="a-theme-btn">
+      <svg id="a-theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+    </button>
+  </div>
+
+  <!-- App wrap -->
+  <div class="app-wrap">
+
+    <!-- ───── HOME ───── -->
+    <div class="app-screen active" id="as-home">
+      <div class="a-greet" style="padding-top:70px">
+        <div class="a-greet-date" id="a-greet-date"></div>
+        <div class="a-greet-name">A paz esteja convosco.</div>
+        <div class="a-greet-lit"><span class="a-lit-dot" id="a-lit-dot" style="background:var(--green)"></span><span id="a-lit-season">Tempo Comum · Cor litúrgica verde</span></div>
+      </div>
+      <div class="a-streak" id="a-streak"></div>
+      <div class="a-sec">
+        <div class="a-sec-head"><div class="a-sec-title">Evangelho de hoje</div><div class="a-sec-link" onclick="aNav('palavra')">Liturgia ›</div></div>
+        <div class="a-card a-feature-card a-tap" onclick="aOpenReader('gospel')" id="a-gospel-card">
+          <div class="tag" id="a-gospel-tag" style="display:flex;align-items:center;gap:8px">
+            <span id="a-gospel-loading" style="display:inline-flex;gap:4px;align-items:center"><span class="a-ia-typing" style="display:inline-flex;gap:3px"><span></span><span></span><span></span></span> Carregando liturgia…</span>
+            <span id="a-gospel-ref" style="display:none">Evangelho</span>
+          </div>
+          <div class="a-gospel-txt" id="a-gospel-txt" style="color:var(--ink-faint);font-size:15px;font-style:italic">Buscando o evangelho de hoje…</div>
+          <div class="a-pill-row">
+            <button class="a-pill primary" onclick="event.stopPropagation();aOpenReader('gospel')">Ler completo</button>
+            <button class="a-pill" onclick="event.stopPropagation();aToast('Reflexão em breve')">Refletir</button>
+          </div>
+        </div>
+      </div>
+      <div class="a-quick-grid">
+        <div class="a-quick" onclick="aStartTercio()"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="4" r="1.6"/><circle cx="6.2" cy="7.5" r="1.4"/><circle cx="17.8" cy="7.5" r="1.4"/><path d="M12 16v5M10.5 21h3" stroke-linecap="round"/></svg></span><span class="ql">Terço</span></div>
+        <div class="a-quick" onclick="aOpenOver('exame')"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span><span class="ql">Exame</span></div>
+        <div class="a-quick" onclick="aNav('palavra')"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg></span><span class="ql">Bíblia</span></div>
+        <div class="a-quick" onclick="aOpenOver('ia')"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg></span><span class="ql">IA Católica</span></div>
+      </div>
+      <div class="a-sec">
+        <div class="a-sec-head"><div class="a-sec-title">Santo do dia</div><div class="a-sec-link" onclick="aOpenOver('santos')">Todos ›</div></div>
+        <div class="a-card a-card-pad a-tap" id="a-saint-card" onclick="aOpenSaint('paulino')">
+          <div class="a-saint-row">
+            <div class="a-saint-portrait" id="a-saint-portrait"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a3 3 0 013 3c0 1.3-.84 2.4-2 2.82V9h2a1 1 0 010 2h-2v2.5l3.5 6.5a1 1 0 01-.88 1.5H8.38a1 1 0 01-.88-1.5L11 13.5V11H9a1 1 0 010-2h2v-1.18A3 3 0 0112 2z"/></svg></div>
+            <div class="a-saint-info"><div class="n" id="a-saint-name">Carregando…</div><div class="d" id="a-saint-desc" style="color:var(--ink-faint);font-style:italic">Buscando o santo do dia…</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="a-sec">
+        <div class="a-card a-intention-card">
+          <div class="a-int-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 3"/></svg></div>
+          <div><div class="a-int-label" id="a-int-label">Intenção do Papa · Junho</div><div class="a-int-text" id="a-int-text">Para que cada um encontre a beleza do encontro pessoal com Cristo e dê testemunho de Sua misericórdia.</div></div>
+        </div>
+      </div>
+      <div class="a-sec">
+        <div class="a-card a-quote-card">
+          <div class="a-quote-mark">"</div>
+          <div class="a-quote-text" id="a-quote-text">Tarde Vos amei, ó beleza tão antiga e tão nova, tarde Vos amei!</div>
+          <div class="a-quote-attr" id="a-quote-attr">— Santo Agostinho, Confissões</div>
+        </div>
+      </div>
+      <div class="a-sec">
+        <div class="a-sec-head"><div class="a-sec-title">Seu caminho</div><div class="a-sec-link" onclick="aOpenOver('perfil')">Perfil ›</div></div>
+        <div class="a-card a-card-pad">
+          <div class="a-ring-wrap">
+            <div class="a-ring"><svg width="70" height="70"><circle class="a-ring-track" cx="35" cy="35" r="29" fill="none" stroke-width="7"/><circle class="a-ring-fill" cx="35" cy="35" r="29" fill="none" stroke-width="7" stroke-dasharray="182.2" stroke-dashoffset="73"/></svg><div class="a-ring-lbl"><span class="rv">60%</span><span class="rt">hoje</span></div></div>
+            <div style="flex:1"><div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;margin-bottom:4px">Meta diária</div><div style="font-size:12px;color:var(--ink-soft);line-height:1.5">Terço e Evangelho concluídos. Falta o Exame da noite.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="a-spacer"></div>
+    </div>
+
+    <!-- ───── REZAR ───── -->
+    <div class="app-screen" id="as-rezar">
+      <div class="a-hdr"><div class="a-eyebrow" style="display:block;margin-bottom:6px">Vida de Oração</div><div class="a-hdr-title">Rezar</div><div class="a-hdr-sub">Escolha como quer orar hoje</div></div>
+      <div class="a-cats" id="a-rezar-cats">
+        <div class="a-cat active" onclick="aRezarTab('tercos',this)">Terços</div>
+        <div class="a-cat" onclick="aRezarTab('novenas',this)">Novenas</div>
+        <div class="a-cat" onclick="aRezarTab('devocoes',this)">Devoções</div>
+        <div class="a-cat" onclick="aRezarTab('liturgia',this)">Liturgia das Horas</div>
+      </div>
+      <div class="a-list" id="arz-tercos">
+        <div class="a-li" onclick="aStartTercio()"><div class="a-li-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="4" r="1.6"/><circle cx="6.2" cy="7.5" r="1.4"/><circle cx="17.8" cy="7.5" r="1.4"/><path d="M12 16v5M10.5 21h3" stroke-linecap="round"/></svg></div><div class="a-li-body"><div class="a-li-t">Santo Terço</div><div class="a-li-s">Guiado conta a conta</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('tercodivina')"><div class="a-li-ico">✝</div><div class="a-li-body"><div class="a-li-t">Terço da Divina Misericórdia</div><div class="a-li-s">Santa Faustina · 15h</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('viasacra')"><div class="a-li-ico">✝</div><div class="a-li-body"><div class="a-li-t">Via Sacra</div><div class="a-li-s">14 estações da Paixão</div></div><span class="a-li-arr">›</span></div>
+      </div>
+      <div class="a-list" id="arz-novenas" style="display:none">
+        <div class="a-li" onclick="aOpenReader('novena-aparecida')"><div class="a-li-ico">🌹</div><div class="a-li-body"><div class="a-li-t">Nossa Senhora Aparecida</div><div class="a-li-s">9 dias</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('novena-jose')"><div class="a-li-ico">🪚</div><div class="a-li-body"><div class="a-li-t">São José</div><div class="a-li-s">Para graças urgentes · 9 dias</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('novena-sagrado')"><div class="a-li-ico">❤</div><div class="a-li-body"><div class="a-li-t">Sagrado Coração de Jesus</div><div class="a-li-s">9 dias</div></div><span class="a-li-arr">›</span></div>
+      </div>
+      <div class="a-list" id="arz-devocoes" style="display:none">
+        <div class="a-li" onclick="aOpenReader('angelus')"><div class="a-li-ico">🔔</div><div class="a-li-body"><div class="a-li-t">Angelus</div><div class="a-li-s">6h · 12h · 18h</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('adoracao')"><div class="a-li-ico">🕯</div><div class="a-li-body"><div class="a-li-t">Adoração ao Santíssimo</div><div class="a-li-s">Guia de hora santa</div></div><span class="a-li-arr">›</span></div>
+      </div>
+      <div class="a-list" id="arz-liturgia" style="display:none">
+        <div class="a-li" onclick="aOpenReader('laudes')"><div class="a-li-ico">🌅</div><div class="a-li-body"><div class="a-li-t">Laudes</div><div class="a-li-s">Oração da manhã</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('vesperas')"><div class="a-li-ico">🌇</div><div class="a-li-body"><div class="a-li-t">Vésperas</div><div class="a-li-s">Oração da tarde</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('completas')"><div class="a-li-ico">🌙</div><div class="a-li-body"><div class="a-li-t">Completas</div><div class="a-li-s">Oração da noite</div></div><span class="a-li-arr">›</span></div>
+      </div>
+      <div class="a-spacer"></div>
+    </div>
+
+    <!-- ───── PALAVRA ───── -->
+    <div class="app-screen" id="as-palavra">
+      <div class="a-hdr"><div class="a-eyebrow" style="display:block;margin-bottom:6px">Sagrada Escritura</div><div class="a-hdr-title">A Palavra</div><div class="a-hdr-sub">Liturgia diária e Bíblia Sagrada</div></div>
+      <div class="a-sec">
+        <div class="a-card a-feature-card a-tap" onclick="aOpenReader('gospel')" style="background:linear-gradient(160deg,var(--marian),#1c3257);color:#fff">
+          <div class="tag" style="color:var(--gold-soft)">Liturgia de hoje</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:5px">12ª Semana do Tempo Comum</div>
+          <div style="font-size:13px;opacity:.85;line-height:1.6">1ª Leitura · Gn 12, 1-9<br>Salmo · Sl 32<br>Evangelho · Mt 7, 1-5</div>
+          <div class="a-pill-row"><button class="a-pill" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.2)" onclick="event.stopPropagation();aOpenReader('gospel')">Ler a liturgia ›</button></div>
+        </div>
+      </div>
+      <div class="a-cats">
+        <div class="a-cat active" onclick="aBibTab('nt',this)">Novo Testamento</div>
+        <div class="a-cat" onclick="aBibTab('at',this)">Antigo Testamento</div>
+        <div class="a-cat" onclick="aBibTab('temas',this)">Por temas</div>
+      </div>
+      <div class="a-list" id="bnt">
+        <div class="a-li" onclick="aOpenReader('mateus')"><div class="a-li-ico">📖</div><div class="a-li-body"><div class="a-li-t">Evangelho de São Mateus</div><div class="a-li-s">As Bem-aventuranças · Mt 5</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('joao')"><div class="a-li-ico">📖</div><div class="a-li-body"><div class="a-li-t">Evangelho de São João</div><div class="a-li-s">"No princípio era o Verbo" · Jo 1</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('romanos')"><div class="a-li-ico">📖</div><div class="a-li-body"><div class="a-li-t">Carta aos Romanos</div><div class="a-li-s">Nada nos separa de Cristo · Rm 8</div></div><span class="a-li-arr">›</span></div>
+      </div>
+      <div class="a-list" id="bat" style="display:none">
+        <div class="a-li" onclick="aOpenReader('salmos')"><div class="a-li-ico">📜</div><div class="a-li-body"><div class="a-li-t">Salmos</div><div class="a-li-s">O Bom Pastor · Sl 22(23)</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('isaias')"><div class="a-li-ico">📜</div><div class="a-li-body"><div class="a-li-t">Isaías</div><div class="a-li-s">"Não temas" · Is 43</div></div><span class="a-li-arr">›</span></div>
+      </div>
+      <div class="a-list" id="btemas" style="display:none">
+        <div class="a-li" onclick="aOpenReader('tema-esperanca')"><div class="a-li-ico">⚓</div><div class="a-li-body"><div class="a-li-t">Esperança</div><div class="a-li-s">Versículos para tempos difíceis</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('tema-perdao')"><div class="a-li-ico">🕊</div><div class="a-li-body"><div class="a-li-t">Perdão</div><div class="a-li-s">A misericórdia de Deus</div></div><span class="a-li-arr">›</span></div>
+      </div>
+      <div class="a-spacer"></div>
+    </div>
+
+    <!-- ───── ORAÇÕES ───── -->
+    <div class="app-screen" id="as-oracoes">
+      <div class="a-hdr"><div class="a-eyebrow" style="display:block;margin-bottom:6px">Tesouro da Igreja</div><div class="a-hdr-title">Orações</div><div class="a-hdr-sub">Biblioteca organizada</div></div>
+      <div class="a-cats">
+        <div class="a-cat active" onclick="aOrTab('essenciais',this)">Essenciais</div>
+        <div class="a-cat" onclick="aOrTab('marianas',this)">Marianas</div>
+        <div class="a-cat" onclick="aOrTab('dia',this)">Para o dia</div>
+        <div class="a-cat" onclick="aOrTab('eucaristia',this)">Eucaristia</div>
+        <div class="a-cat" onclick="aOrTab('vida',this)">Vida</div>
+      </div>
+      <div class="a-list" id="or-essenciais"></div>
+      <div class="a-list" id="or-marianas" style="display:none"></div>
+      <div class="a-list" id="or-dia" style="display:none"></div>
+      <div class="a-list" id="or-eucaristia" style="display:none"></div>
+      <div class="a-list" id="or-vida" style="display:none"></div>
+      <div class="a-spacer"></div>
+    </div>
+
+    <!-- ───── MAIS ───── -->
+    <div class="app-screen" id="as-mais">
+      <div class="a-hdr"><div class="a-eyebrow" style="display:block;margin-bottom:6px">Manual da Fé</div><div class="a-hdr-title">Explorar</div><div class="a-hdr-sub">Tudo para viver a fé católica</div></div>
+      <div class="a-list-eyebrow">Sacramentos &amp; Vida Espiritual</div>
+      <div class="a-list">
+        <div class="a-li" onclick="aOpenOver('exame')"><div class="a-li-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="a-li-body"><div class="a-li-t">Exame de Consciência</div><div class="a-li-s">Gera roteiro para a Confissão</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('confissao')"><div class="a-li-ico">🕊</div><div class="a-li-body"><div class="a-li-t">Como se Confessar</div><div class="a-li-s">Manual passo a passo</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenReader('missa')"><div class="a-li-ico">⛪</div><div class="a-li-body"><div class="a-li-t">A Santa Missa explicada</div><div class="a-li-s">Cada parte e símbolo</div></div><span class="a-li-arr">›</span></div>
+      </div>
+      <div class="a-list-eyebrow">Doutrina &amp; Estudo</div>
+      <div class="a-list">
+        <div class="a-li" onclick="aOpenOver('catecismo')"><div class="a-li-ico">📕</div><div class="a-li-body"><div class="a-li-t">Catecismo da Igreja Católica</div><div class="a-li-s">As quatro partes</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenOver('santos')"><div class="a-li-ico">👼</div><div class="a-li-body"><div class="a-li-t">Vida dos Santos</div><div class="a-li-s">Biografias e devoções</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenOver('ia')"><div class="a-li-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg></div><div class="a-li-body"><div class="a-li-t">IA Católica</div><div class="a-li-s">Dúvidas com fontes do Magistério</div></div><span class="a-li-arr">›</span></div>
+        <div class="a-li" onclick="aOpenOver('perfil')"><div class="a-li-ico">👤</div><div class="a-li-body"><div class="a-li-t">Meu Perfil</div><div class="a-li-s">Progresso e conquistas</div></div><span class="a-li-arr">›</span></div>
+      </div>
+      <div class="a-spacer"></div>
+    </div>
+
+    <!-- ───── BOTTOM NAV ───── -->
+    <nav class="a-nav">
+      <button class="a-nav-btn active" id="an-home" onclick="aNav('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg><span class="a-nav-label">Início</span></button>
+      <button class="a-nav-btn" id="an-rezar" onclick="aNav('rezar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="4.2" r="1.5"/><circle cx="6.5" cy="7.6" r="1.3"/><circle cx="17.5" cy="7.6" r="1.3"/><path d="M12 15.5V20M10.5 20h3" stroke-linecap="round"/></svg><span class="a-nav-label">Rezar</span></button>
+      <button class="a-nav-btn" id="an-palavra" onclick="aNav('palavra')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg><span class="a-nav-label">Palavra</span></button>
+      <button class="a-nav-btn" id="an-oracoes" onclick="aNav('oracoes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zM12 3v18M3 12h18"/></svg><span class="a-nav-label">Orações</span></button>
+      <button class="a-nav-btn" id="an-mais" onclick="aNav('mais')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg><span class="a-nav-label">Mais</span></button>
+    </nav>
+
+    <!-- ───── OVERLAYS ───── -->
+    <!-- Reader -->
+    <div class="a-over" id="aov-reader">
+      <div class="a-over-bar"><button class="a-over-back" onclick="aCloseOver('reader')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button><div class="a-over-title" id="ard-bartitle">Leitura</div><button class="a-icon-btn" onclick="aToast('Salvo nos favoritos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/></svg></button></div>
+      <div class="a-over-scroll"><div class="a-rd-sub" id="ard-sub"></div><div class="a-rd-title" id="ard-title"></div><div class="a-rd-meta" id="ard-meta"></div><div class="a-rd-body" id="ard-body"></div></div>
+    </div>
+    <!-- Terço -->
+    <div class="a-over" id="aov-tercio">
+      <div class="a-over-bar"><button class="a-over-back" onclick="aCloseOver('tercio')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button><div class="a-over-title">Santo Terço</div></div>
+      <div class="a-over-scroll" id="atercio-content"></div>
+    </div>
+    <!-- Exame -->
+    <div class="a-over" id="aov-exame">
+      <div class="a-over-bar"><button class="a-over-back" onclick="aCloseOver('exame')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button><div class="a-over-title">Exame de Consciência</div></div>
+      <div class="a-over-scroll" id="aexame-content"></div>
+    </div>
+    <!-- IA -->
+    <div class="a-over" id="aov-ia">
+      <div class="a-over-bar"><button class="a-over-back" onclick="aCloseOver('ia')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button><div class="a-over-title">IA Católica</div></div>
+      <div class="a-ia-wrap">
+        <div class="a-ia-scroll" id="a-ia-scroll">
+          <div class="a-ia-welcome" id="a-ia-welcome">
+            <div class="a-ia-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg></div>
+            <h3>Assistente da Fé</h3>
+            <p>Dúvidas sobre doutrina, oração, santos e Escritura. Fundamentado no Catecismo e no Magistério.</p>
+            <div class="a-ia-suggests">
+              <button class="a-ia-sug" onclick="aIaSuggest('O que é a Eucaristia segundo a Igreja?')">O que é a Eucaristia segundo a Igreja?</button>
+              <button class="a-ia-sug" onclick="aIaSuggest('Como começar a rezar o Terço?')">Como começar a rezar o Terço?</button>
+              <button class="a-ia-sug" onclick="aIaSuggest('Qual a diferença entre pecado mortal e venial?')">Pecado mortal vs. venial?</button>
+              <button class="a-ia-sug" onclick="aIaSuggest('O que a Igreja ensina sobre o sofrimento?')">O sofrimento segundo a Igreja?</button>
+            </div>
+          </div>
+        </div>
+        <div class="a-ia-disc">A IA pode errar. Para decisões importantes, consulte um padre.</div>
+        <div class="a-ia-input-bar">
+          <textarea class="a-ia-input" id="a-ia-input" rows="1" placeholder="Pergunte sobre a fé…" oninput="aIaGrow(this)" onkeydown="aIaKey(event)"></textarea>
+          <button class="a-ia-send" id="a-ia-send" onclick="aIaSend()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <!-- Catecismo -->
+    <div class="a-over" id="aov-catecismo">
+      <div class="a-over-bar"><button class="a-over-back" onclick="aCloseOver('catecismo')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button><div class="a-over-title">Catecismo</div></div>
+      <div class="a-over-scroll" id="acatecismo-content"></div>
+    </div>
+    <!-- Santos -->
+    <div class="a-over" id="aov-santos">
+      <div class="a-over-bar"><button class="a-over-back" onclick="aCloseOver('santos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button><div class="a-over-title">Vida dos Santos</div></div>
+      <div class="a-over-scroll" id="asantos-content"></div>
+    </div>
+    <!-- Perfil -->
+    <div class="a-over" id="aov-perfil">
+      <div class="a-over-bar"><button class="a-over-back" onclick="aCloseOver('perfil')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button><div class="a-over-title">Meu Perfil</div></div>
+      <div class="a-over-scroll" id="aperfil-content"></div>
+    </div>
+
+    <!-- Perfil edit -->
+    <div class="a-over" id="aov-editperfil">
+      <div class="a-over-bar">
+        <button class="a-over-back" onclick="aCloseOver('editperfil')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button>
+        <div class="a-over-title">Editar perfil</div>
+      </div>
+      <div class="a-over-scroll">
+        <div style="text-align:center;padding:20px 0 28px">
+          <div style="width:80px;height:80px;border-radius:24px;margin:0 auto 14px;background:linear-gradient(160deg,var(--marian),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Cormorant Garamond',serif;font-size:32px" id="ep-avatar">H</div>
+          <div style="font-size:12px;color:var(--ink-faint)">Sua foto de perfil em breve</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <input class="auth-field" type="text" id="ep-fname" placeholder="Nome" style="margin:0"/>
+          <input class="auth-field" type="text" id="ep-lname" placeholder="Sobrenome" style="margin:0"/>
+        </div>
+        <input class="auth-field" type="email" id="ep-email" placeholder="E-mail" disabled style="margin-bottom:12px;opacity:.5;cursor:not-allowed"/>
+        <div style="font-size:11.5px;color:var(--ink-faint);margin-bottom:20px;padding-left:4px">O e-mail não pode ser alterado por aqui.</div>
+        <div style="font-size:12px;color:var(--ink-faint);text-align:center;margin-bottom:10px" id="ep-msg"></div>
+        <button class="a-btn a-btn-primary" onclick="saveProfile()">Salvar alterações</button>
+        <div class="a-btn-row" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--line-soft)">
+          <button class="a-btn a-btn-ghost" style="font-size:13px;color:var(--rose)" onclick="if(confirm('Sair da conta?')){if(sb)sb.auth.signOut();currentUser=null;authToken=null;document.getElementById('a-user-badge').style.display='none';aCloseOver('editperfil');localStorage.clear();}">Sair da conta</button>
+        </div>
+      </div>
+    </div>
+    <div class="a-toast" id="a-toast"></div>
+</div><!-- /app-overlay -->
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   CONFIGURAÇÃO SUPABASE
+   Preencha com os dados do seu projeto em supabase.com
+   Settings → API → Project URL e anon/public key
+════════════════════════════════════════════════════════ */
+const SUPABASE_URL  = 'https://gsadejcvjwppmcczytxe.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_08xnxUnlQM-tV-BppHq_Lw_RdOxcBsp';
+const AI_EDGE_URL   = SUPABASE_URL + '/functions/v1/sanctus-ai';
+
+// Se não configurado → modo demo (funciona dentro do Claude.ai)
+const SB_READY = !SUPABASE_URL.includes('SEU_SUPABASE') && window.supabase;
+let sb = null;
+if (SB_READY) {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { persistSession: true, autoRefreshToken: true }
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUTH — Login · Cadastro · Guest
+════════════════════════════════════════════════════════ */
+let currentUser = null;
+let authToken   = null;
+
+function switchTab(t){
+  document.getElementById('tab-login').classList.toggle('active', t==='login');
+  document.getElementById('tab-signup').classList.toggle('active', t==='signup');
+  document.getElementById('form-login').style.display  = t==='login'  ? '' : 'none';
+  document.getElementById('form-signup').style.display = t==='signup' ? '' : 'none';
+  setAuthMsg('','');
+}
+function setAuthMsg(err, ok){
+  const e=document.getElementById('auth-error');
+  const s=document.getElementById('auth-success');
+  e.textContent=err; e.style.display=err?'':'none';
+  s.textContent=ok;  s.style.display=ok ?'':'none';
+}
+function setAuthLoading(id, loading){
+  const b=document.getElementById(id);
+  b.disabled=loading;
+  b.textContent=loading ? 'Aguarde…' : (id==='btn-login' ? 'Entrar' : 'Criar conta');
+}
+
+async function doLogin(){
+  if(!sb){ doGuest(); return; }
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  if(!email||!pass){ setAuthMsg('Preencha e-mail e senha.',''); return; }
+  setAuthLoading('btn-login', true);
+  const { data, error } = await sb.auth.signInWithPassword({ email, password:pass });
+  setAuthLoading('btn-login', false);
+  if(error){ setAuthMsg(error.message.includes('Invalid')?'E-mail ou senha incorretos.':error.message,''); return; }
+  await onAuthSuccess(data.user, data.session);
+}
+
+async function doSignup(){
+  if(!sb){ doGuest(); return; }
+  const fname = document.getElementById('signup-fname').value.trim();
+  const lname = document.getElementById('signup-lname').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass  = document.getElementById('signup-pass').value;
+  if(!fname||!lname||!email||!pass){ setAuthMsg('Preencha todos os campos.',''); return; }
+  if(pass.length<6){ setAuthMsg('A senha precisa ter pelo menos 6 caracteres.',''); return; }
+  setAuthLoading('btn-signup', true);
+  const { data, error } = await sb.auth.signUp({
+    email, password: pass,
+    options: { data: { first_name: fname, last_name: lname, display_name: fname+' '+lname } }
+  });
+  setAuthLoading('btn-signup', false);
+  if(error){ setAuthMsg(error.message,''); return; }
+  // Tenta logar direto (funciona quando confirmação de email está desativada)
+  if(data.user && !data.session){
+    const { data: loginData, error: loginErr } = await sb.auth.signInWithPassword({email, password:pass});
+    if(!loginErr && loginData.session){
+      await onAuthSuccess(loginData.user, loginData.session);
+      return;
+    }
+    setAuthMsg('', 'Conta criada! Verifique seu e-mail para entrar. ✓');
+    return;
+  }
+  await onAuthSuccess(data.user, data.session);
+}
+
+function doGuest(){
+  document.getElementById('auth-modal').classList.remove('on');
+  showApp();
+}
+
+async function onAuthSuccess(user, session){
+  currentUser = user;
+  authToken   = session?.access_token;
+  document.getElementById('auth-modal').classList.remove('on');
+
+  await syncStatsFromSupabase();
+
+  const fname = user.user_metadata?.first_name || user.user_metadata?.display_name?.split(' ')[0] || user.email?.split('@')[0] || 'Fiel';
+  const badge = document.getElementById('a-user-badge');
+  const uname = document.getElementById('a-user-name');
+  if(badge) badge.style.display='flex';
+  if(uname) uname.textContent = fname;
+
+  showApp();
+}
+
+function showLogout(){
+  if(confirm('Sair da conta?')){
+    if(sb) sb.auth.signOut();
+    currentUser = null; authToken = null;
+    const badge = document.getElementById('a-user-badge');
+    if(badge) badge.style.display='none';
+    localStorage.clear();
+  }
+}
+
+// Verifica sessão existente (ex: usuário volta ao site)
+async function checkExistingSession(){
+  if(!sb) return false;
+  const { data: { session } } = await sb.auth.getSession();
+  if(session){
+    currentUser = session.user;
+    authToken   = session.access_token;
+    const name = session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Fiel';
+    const badge = document.getElementById('a-user-badge');
+    const uname = document.getElementById('a-user-name');
+    if(badge){ badge.style.display='flex'; }
+    if(uname){ uname.textContent = name; }
+    return true;
+  }
+  return false;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SUPABASE — SYNC DE STATS
+════════════════════════════════════════════════════════ */
+async function syncStatsFromSupabase(){
+  if(!sb || !currentUser) return;
+  try{
+    const { data } = await sb
+      .from('user_stats')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .single();
+    if(data){
+      const today = new Date().toISOString().slice(0,10);
+      const last  = data.last_date;
+      let streak  = data.streak || 0;
+      if(last===today){ /* mantém */ }
+      else if(last===prevDay(today)){ streak++; }
+      else{ streak=1; }
+      aState.streak  = streak;
+      aState.tercos  = data.tercos  || 0;
+      aState.prayers = data.prayers || 0;
+      aState.mins    = data.mins    || 0;
+      renderStreak();
+      // Salva streak atualizado
+      await sb.from('user_stats').update({ streak, last_date: today, updated_at: new Date() }).eq('user_id', currentUser.id);
+    }
+  }catch(e){ /* ignora, usa localStorage */ }
+}
+
+async function syncStatsToSupabase(){
+  if(!sb || !currentUser) return;
+  try{
+    await sb.from('user_stats').upsert({
+      user_id:    currentUser.id,
+      streak:     aState.streak,
+      tercos:     aState.tercos,
+      prayers:    aState.prayers,
+      mins:       aState.mins,
+      last_date:  new Date().toISOString().slice(0,10),
+      updated_at: new Date(),
+    });
+  }catch(e){ /* ignora */ }
+}
+
+/* ═══════════════════════════════════════════════════════
+   LANDING JS
+════════════════════════════════════════════════════════ */
+let lCur=0,lTotal=4,lAuto;
+function goLC(n){document.querySelectorAll('.l-card').forEach((c,i)=>c.classList.toggle('active',i===n));document.querySelectorAll('.l-dot').forEach((d,i)=>d.classList.toggle('active',i===n));lCur=n;}
+function nextLC(){goLC((lCur+1)%lTotal);resetLA();}
+function prevLC(){goLC((lCur-1+lTotal)%lTotal);resetLA();}
+function resetLA(){clearInterval(lAuto);lAuto=setInterval(()=>goLC((lCur+1)%lTotal),4500);}
+lAuto=setInterval(()=>goLC((lCur+1)%lTotal),4500);
+
+// Scroll reveal
+const lObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}});},{threshold:.1});
+document.querySelectorAll('.l-feat,.l-test').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(20px)';el.style.transition='opacity .6s ease,transform .6s ease';lObs.observe(el);});
+
+/* ═══════════ APP TOGGLE ═══════════ */
+async function enterApp(){
+  setAuthMsg('','');
+  if(SB_READY && sb){
+    const hasSession = await checkExistingSession();
+    if(hasSession){
+      showApp();
+    } else {
+      document.getElementById('auth-modal').classList.add('on');
+    }
+  } else {
+    // Modo demo (dentro do Claude.ai ou sem Supabase configurado)
+    showApp();
+  }
+}
+function showApp(){
+  const ov=document.getElementById('app-overlay');
+  ov.style.display='block';ov.classList.add('entering');
+  document.body.classList.add('app-mode');
+  setTimeout(()=>ov.classList.remove('entering'),400);
+  const today=new Date().toISOString().slice(0,10);
+  const cached=sessionStorage.getItem('sanctus_daily');
+  if(!cached || JSON.parse(cached).date!==today){
+    fetchDailyData();
+  } else {
+    applyDailyData(JSON.parse(cached));
+  }
+}
+function exitApp(){
+  document.getElementById('app-overlay').style.display='none';
+  document.body.classList.remove('app-mode');
+}
+
+/* ═══════════ THEME ═══════════ */
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',next);
+  const moon='<path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>';
+  const sun='<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>';
+  document.getElementById('a-theme-icon').innerHTML=next==='dark'?sun:moon;
+}
+
+/* ═══════════ LOCAL STORAGE — STATS REAIS ═══════════ */
+function initStorage(){
+  const today=new Date().toISOString().slice(0,10);
+  const last=localStorage.getItem('sanctus_lastDate');
+  let streak=parseInt(localStorage.getItem('sanctus_streak')||'0');
+  if(last===today){/* mesmo dia, mantém */}
+  else if(last===prevDay(today)){streak=Math.max(1,streak+1);}
+  else{streak=1;}
+  localStorage.setItem('sanctus_lastDate',today);
+  localStorage.setItem('sanctus_streak',streak);
+  return {
+    streak,
+    tercos:parseInt(localStorage.getItem('sanctus_tercos')||'0'),
+    prayers:parseInt(localStorage.getItem('sanctus_prayers')||'0'),
+    mins:parseInt(localStorage.getItem('sanctus_mins')||'0'),
+    examChecked:{},
+  };
+}
+function prevDay(iso){const d=new Date(iso);d.setDate(d.getDate()-1);return d.toISOString().slice(0,10);}
+function saveStats(k,v){localStorage.setItem('sanctus_'+k,v);}
+const aState=initStorage();
+
+/* ═══════════ APP NAV ═══════════ */
+function aNav(tab){
+  document.querySelectorAll('.app-screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.a-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('as-'+tab).classList.add('active');
+  document.getElementById('an-'+tab).classList.add('active');
+  document.querySelector('.app-screen.active').scrollTop=0;
+}
+let aToastT;
+function aToast(m){const t=document.getElementById('a-toast');t.textContent=m;t.classList.add('show');clearTimeout(aToastT);aToastT=setTimeout(()=>t.classList.remove('show'),2000);}
+
+// Date
+const DAYS_PT=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+const MONTHS_PT=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const now=new Date();
+document.getElementById('a-greet-date').textContent=DAYS_PT[now.getDay()]+', '+now.getDate()+' de '+MONTHS_PT[now.getMonth()];
+function renderStreak(){
+  document.getElementById('a-streak').innerHTML=`<div class="a-chip gold"><div class="v">${aState.streak}<small>🔥</small></div><div class="l">dias seguidos</div></div><div class="a-chip"><div class="v">${aState.tercos}</div><div class="l">terços rezados</div></div><div class="a-chip"><div class="v">${aState.prayers}</div><div class="l">orações</div></div><div class="a-chip"><div class="v">${aState.mins||'0'}<small>min</small></div><div class="l">hoje</div></div>`;
+}
+renderStreak();
+
+/* ═══════════ FETCH DADOS DIÁRIOS VIA API ═══════════ */
+const DAILY_SYSTEM=`Você é um especialista em liturgia católica e calendário litúrgico romano. Hoje é ${now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}.
+
+Retorne SOMENTE um objeto JSON válido, sem markdown, sem explicação, sem aspas extras ao redor do JSON. Estrutura exata:
+{
+  "date": "${now.toISOString().slice(0,10)}",
+  "saint": {
+    "name": "Nome do santo do dia no calendário romano",
+    "title": "Título ou vocação do santo (ex: Bispo e Confessor, séc. IV)",
+    "description": "Uma frase curta e cativante sobre quem foi este santo (máx 20 palavras)"
+  },
+  "gospel": {
+    "reference": "Referência completa (ex: Mt 7, 1-5)",
+    "week": "Nome da semana litúrgica (ex: 12ª Semana do Tempo Comum — Ano C)",
+    "excerpt": "Trecho do evangelho do dia em português, máx 2 frases, começando com aspas"
+  },
+  "liturgy": {
+    "season": "Nome do tempo litúrgico em português (ex: Tempo Comum, Quaresma, Páscoa, Advento, Natal)",
+    "colorName": "Nome da cor em português (ex: Verde, Roxo, Branco, Vermelho)",
+    "colorHex": "Código hex da cor litúrgica (ex: #5a7d52 para verde, #6b3f7a para roxo, #c9a96b para branco/dourado, #b04040 para vermelho)"
+  },
+  "quote": {
+    "text": "Frase de um santo ou padre da Igreja relacionada ao evangelho de hoje",
+    "author": "Nome do santo (ex: Santo Agostinho, Confissões)"
+  }
+}`;
+
+async function fetchDailyData(){
+  const callApi = async (useEdge) => {
+    const url   = useEdge ? AI_EDGE_URL : "https://api.anthropic.com/v1/messages";
+    const hdrs  = useEdge
+      ? {"Content-Type":"application/json","Authorization":"Bearer "+authToken}
+      : {"Content-Type":"application/json"};
+    const res = await fetch(url,{method:"POST",headers:hdrs,
+      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:800,
+        system:DAILY_SYSTEM,messages:[{role:"user",content:"Retorne os dados litúrgicos de hoje em JSON."}]})});
+    const d = await res.json();
+    if(d.error) throw new Error(d.error.message||'API error');
+    return d;
+  };
+
+  try{
+    let data;
+    if(SB_READY && currentUser && authToken){
+      try{ data = await callApi(true); }         // tenta Edge Function
+      catch(e){ data = await callApi(false); }   // fallback: API direta
+    } else {
+      data = await callApi(false);               // sem Supabase: API direta
+    }
+
+    const raw   = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    parsed.date = now.toISOString().slice(0,10);
+    sessionStorage.setItem('sanctus_daily', JSON.stringify(parsed));
+    applyDailyData(parsed);
+  } catch(e){
+    // fallback visual limpo
+    const gl = document.getElementById('a-gospel-loading');
+    const gr = document.getElementById('a-gospel-ref');
+    const gt = document.getElementById('a-gospel-txt');
+    if(gl) gl.style.display='none';
+    if(gr){ gr.style.display='inline'; gr.textContent='Evangelho de hoje'; }
+    if(gt){ gt.style.color=''; gt.style.fontStyle=''; gt.textContent='"Buscai primeiro o reino de Deus e a sua justiça." — Mt 6, 33'; }
+    const sn = document.getElementById('a-saint-name');
+    const sd = document.getElementById('a-saint-desc');
+    if(sn) sn.textContent = 'Santo do dia';
+    if(sd){ sd.style.fontStyle=''; sd.style.color=''; sd.textContent='Consulte o calendário litúrgico para o santo de hoje.'; }
+  }
+}
+
+function applyDailyData(d){
+  // Gospel
+  const gloading=document.getElementById('a-gospel-loading');
+  const gref=document.getElementById('a-gospel-ref');
+  const gtxt=document.getElementById('a-gospel-txt');
+  if(gloading)gloading.style.display='none';
+  if(gref){gref.style.display='inline';gref.textContent='Evangelho · '+(d.gospel?.reference||'');}
+  if(gtxt){gtxt.style.color='';gtxt.style.fontStyle='';gtxt.textContent=d.gospel?.excerpt||'';}
+
+  // Atualiza o reader do gospel
+  if(READINGS.gospel && d.gospel){
+    READINGS.gospel.title='Evangelho · '+(d.gospel.reference||'');
+    READINGS.gospel.sub=(d.gospel.week||'Liturgia de hoje');
+  }
+
+  // Santo
+  if(d.saint){
+    const sname=document.getElementById('a-saint-name');
+    const sdesc=document.getElementById('a-saint-desc');
+    const sc=document.getElementById('a-saint-card');
+    if(sname){sname.textContent=d.saint.name||'';}
+    if(sdesc){sdesc.style.fontStyle='';sdesc.style.color='';sdesc.textContent=(d.saint.title||'')+' · '+(d.saint.description||'');}
+    // Salva no objeto ASAINTS para poder abrir o reader
+    ASAINTS['today']={
+      n:d.saint.name,d:d.saint.title,pat:'',feast:DAYS_PT[now.getDay()]+', '+now.getDate()+' de '+MONTHS_PT[now.getMonth()],
+      bio:d.saint.description,v:[],frase:''
+    };
+    if(sc)sc.onclick=()=>aOpenSaint('today');
+  }
+
+  // Liturgia — cor e estação
+  if(d.liturgy){
+    const dot=document.getElementById('a-lit-dot');
+    const season=document.getElementById('a-lit-season');
+    if(dot&&d.liturgy.colorHex)dot.style.background=d.liturgy.colorHex;
+    if(season)season.textContent=(d.liturgy.season||'')+' · Cor litúrgica '+(d.liturgy.colorName||'').toLowerCase();
+  }
+
+  // Frase do santo
+  if(d.quote){
+    const qt=document.getElementById('a-quote-text');
+    const qa=document.getElementById('a-quote-attr');
+    if(qt)qt.textContent=d.quote.text||'';
+    if(qa)qa.textContent='— '+(d.quote.author||'');
+  }
+}
+
+function aOpenOver(id){
+  document.getElementById('aov-'+id).classList.add('on');
+  if(id==='exame')aRenderExame();
+  if(id==='catecismo')aRenderCatecismo();
+  if(id==='santos')aRenderSantos();
+  if(id==='perfil')aRenderPerfil();
+}
+function aCloseOver(id){document.getElementById('aov-'+id).classList.remove('on');}
+
+/* ═══════════ READINGS DATA ═══════════ */
+const PAI='Pai nosso, que estais nos céus, santificado seja o vosso nome; venha a nós o vosso reino; seja feita a vossa vontade, assim na terra como no céu. O pão nosso de cada dia nos dai hoje; perdoai-nos as nossas ofensas, assim como nós perdoamos a quem nos tem ofendido; e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém.';
+const AVE='Ave Maria, cheia de graça, o Senhor é convosco; bendita sois vós entre as mulheres e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós pecadores, agora e na hora da nossa morte. Amém.';
+const GLORIA='Glória ao Pai, e ao Filho, e ao Espírito Santo. Como era no princípio, agora e sempre pelos séculos dos séculos. Amém.';
+const FATIMA='Ó meu Jesus, perdoai-nos e livrai-nos do fogo do inferno; levai as almas todas para o Céu, especialmente as que mais precisarem de Vossa Misericórdia. Amém.';
+
+const READINGS={
+  gospel:{sub:'12ª Semana do Tempo Comum',title:'Evangelho · Mt 7, 1-5',meta:['Verde','Tempo Comum'],body:`<p>Naquele tempo, disse Jesus aos seus discípulos:</p><p>"Não julgueis, para não serdes julgados; pois com o critério com que julgais, sereis também julgados, e a medida que usardes para os outros será usada também para vós.</p><p>Por que reparas no cisco que está no olho do teu irmão, e não enxergas a trave que está no teu próprio olho? Hipócrita! Tira primeiro a trave do teu olho, e então verás claro para tirar o cisco do olho do teu irmão."</p>`,note:{t:'Para meditar',b:'Cristo não proíbe o discernimento, mas a condenação do coração. A humildade pede que eu olhe primeiro a minha falha antes de corrigir a do outro.'}},
+  tercodivina:{sub:'Revelado a Santa Faustina',title:'Terço da Divina Misericórdia',meta:['15h'],body:`<p><b>Contas grandes</b>: "Eterno Pai, eu Vos ofereço o Corpo e Sangue, Alma e Divindade do vosso diletíssimo Filho, Nosso Senhor Jesus Cristo, em expiação dos nossos pecados e dos do mundo inteiro."</p><p><b>Contas pequenas</b>: "Pela sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro."</p><p><b>Final (3x)</b>: "Deus Santo, Deus Forte, Deus Imortal, tende piedade de nós e do mundo inteiro."</p>`},
+  viasacra:{sub:'14 estações · Paixão de Cristo',title:'Via Sacra',meta:['Quaresma','Sexta-feira'],body:`<p>Em cada estação: <i>"Adoramos-Vos, ó Cristo, e Vos bendizemos, porque pela vossa santa Cruz remistes o mundo."</i></p><p><b>I.</b> Jesus condenado · <b>II.</b> Carrega a cruz · <b>III.</b> Primeira queda · <b>IV.</b> Encontra a Mãe · <b>V.</b> Simão ajuda · <b>VI.</b> Verônica · <b>VII.</b> Segunda queda · <b>VIII.</b> As mulheres · <b>IX.</b> Terceira queda · <b>X.</b> Despojado · <b>XI.</b> Pregado na cruz · <b>XII.</b> Morre · <b>XIII.</b> Descido · <b>XIV.</b> Sepultado</p>`},
+  'novena-aparecida':{sub:'9 dias',title:'Novena de N. Sra. Aparecida',meta:['Mariana'],body:`<p>Nossa Senhora Aparecida, Padroeira do Brasil, a vós recorremos com fé e confiança. Especialmente vos pedimos: <i>(mencione sua intenção)</i>. Por vossa ternura de Mãe, obtende de Jesus esta graça. Amém.</p><p style="color:var(--gold)">Reze: 1 Pai Nosso · 3 Ave Marias · 1 Glória</p>`},
+  'novena-jose':{sub:'9 dias',title:'Novena a São José',meta:['Causas difíceis'],body:`<p>Glorioso São José, padroeiro das causas difíceis, obtende-me esta graça: <i>(mencione sua intenção)</i>. Mostrai que vossa bondade é tão grande quanto vosso poder. Amém.</p>`},
+  'novena-sagrado':{sub:'9 dias',title:'Novena ao Sagrado Coração',meta:['Cristológica'],body:`<p>Ó Divino Coração de Jesus, concedei-me: <i>(mencione sua intenção)</i>. Sagrado Coração de Jesus, em Vós confio. Amém.</p>`},
+  angelus:{sub:'6h · 12h · 18h',title:'Angelus',meta:['Mariana'],body:`<p>V. O Anjo do Senhor anunciou a Maria.<br>R. E ela concebeu do Espírito Santo. <i>(Ave Maria)</i></p><p>V. Eis aqui a serva do Senhor.<br>R. Faça-se em mim segundo a vossa palavra. <i>(Ave Maria)</i></p><p>V. E o Verbo se fez carne.<br>R. E habitou entre nós. <i>(Ave Maria)</i></p>`},
+  adoracao:{sub:'Hora santa',title:'Adoração ao Santíssimo',meta:['Eucaristia'],body:`<p>Diante de Jesus Sacramentado, basta estar. "Eu O olho e Ele me olha", dizia o camponês de Ars.</p><p><b>Roteiro</b><br>· Adoração — reconhecer a presença real.<br>· Ação de graças — agradecer.<br>· Reparação — pedir perdão.<br>· Súplica — apresentar intenções.</p>`},
+  laudes:{sub:'Liturgia das Horas · manhã',title:'Laudes',meta:['Manhã'],body:`<p><b>Invocação</b><br>Deus, vinde em meu auxílio. Senhor, socorrei-me sem demora. Glória ao Pai…</p><p><b>Salmo 62</b><br>Ó Deus, sois meu Deus, eu vos busco; minha alma tem sede de vós. Em vosso santuário vos contemplei. Vossa graça vale mais que a vida.</p>`},
+  vesperas:{sub:'Liturgia das Horas · tarde',title:'Vésperas',meta:['Tarde'],body:`<p>Ao entardecer, voltamo-nos a Deus com corações gratos.</p><p><b>Magnificat</b><br>A minha alma engrandece o Senhor e o meu espírito se alegra em Deus, meu Salvador…</p>`},
+  completas:{sub:'Liturgia das Horas · noite',title:'Completas',meta:['Noite'],body:`<p><b>Salmo 90</b><br>Quem habita ao abrigo do Altíssimo descansa à sombra do Todo-Poderoso. Digo ao Senhor: "Sois meu refúgio, meu Deus, em quem confio."</p><p><b>Cântico de Simeão</b><br>Agora, Senhor, podeis deixar partir em paz o vosso servo…</p>`},
+  mateus:{sub:'Novo Testamento',title:'São Mateus 5, 1-12',meta:['As Bem-aventuranças'],body:`<p>"Bem-aventurados os pobres em espírito, porque deles é o Reino dos Céus.<br>Bem-aventurados os que choram, porque serão consolados.<br>Bem-aventurados os mansos, porque possuirão a terra.<br>Bem-aventurados os misericordiosos, porque alcançarão misericórdia.<br>Bem-aventurados os puros de coração, porque verão a Deus.<br>Bem-aventurados os que promovem a paz, porque serão chamados filhos de Deus."</p>`},
+  joao:{sub:'Novo Testamento',title:'São João 1, 1-14',meta:['O Prólogo'],body:`<p>No princípio era o Verbo, e o Verbo estava com Deus, e o Verbo era Deus.</p><p>Nele estava a vida, e a vida era a luz dos homens. A luz brilha nas trevas, e as trevas não a venceram.</p><p>E o Verbo se fez carne e habitou entre nós, cheio de graça e de verdade.</p>`},
+  romanos:{sub:'São Paulo',title:'Romanos 8, 28-39',meta:['Confiança'],body:`<p>Sabemos que tudo concorre para o bem daqueles que amam a Deus.</p><p>Quem nos separará do amor de Cristo? Nem a morte nem a vida poderão nos separar do amor de Deus, que está em Cristo Jesus.</p>`},
+  salmos:{sub:'A oração de Israel',title:'Salmo 22 (23)',meta:['O Bom Pastor'],body:`<p>O Senhor é meu pastor, nada me faltará. Em verdes prados me faz repousar; conduz-me às águas refrescantes.</p><p>Ainda que eu atravesse o vale escuro, nada temerei, pois estais comigo: vosso bastão e vosso cajado me dão segurança.</p>`},
+  isaias:{sub:'O Profeta',title:'Isaías 43, 1-3',meta:['Não temas'],body:`<p>Não temas, porque eu te resgatei; chamei-te pelo nome, tu és meu.</p><p>Se atravessares as águas, estarei contigo. Porque eu sou o Senhor teu Deus, o Santo de Israel, o teu Salvador.</p>`},
+  'tema-esperanca':{sub:'Por tema',title:'Esperança',meta:['Coletânea'],body:`<p><b>Jr 29,11</b> — "Eu sei os planos que tenho para vós: planos de paz, para vos dar um futuro e uma esperança."</p><p><b>Rm 5,5</b> — "A esperança não decepciona, porque o amor de Deus foi derramado em nossos corações."</p>`},
+  'tema-perdao':{sub:'Por tema',title:'Perdão',meta:['Coletânea'],body:`<p><b>Lc 15,20</b> — "Estando ainda longe, seu pai o viu e, movido de compaixão, correu e o abraçou."</p><p><b>1Jo 1,9</b> — "Se reconhecemos nossos pecados, Ele é fiel e justo para os perdoar."</p>`},
+  confissao:{sub:'Sacramento da Reconciliação',title:'Como se Confessar',meta:['Passo a passo'],body:`<p><b>1. Exame de consciência</b> — Use o Exame do app.</p><p><b>2. Contrição</b> — Arrependa-se sinceramente.</p><p><b>3. A confissão</b> — "Abençoe-me, Padre, porque pequei. Faz [tempo] desde minha última confissão." Confesse com sinceridade.</p><p><b>4. Absolvição</b> — O padre dá a absolvição — neste momento, Deus perdoa.</p><p><b>5. Penitência</b> — Cumpra o quanto antes.</p>`,note:{t:'Lembre-se',b:'O padre é vinculado ao sigilo absoluto. Nada do que você disser pode ser revelado, jamais.'}},
+  missa:{sub:'Fonte e ápice da vida cristã',title:'A Santa Missa explicada',meta:['Guia completo'],body:`<p><b>Ritos Iniciais</b> — Sinal da cruz, saudação, ato penitencial, Glória.</p><p><b>Liturgia da Palavra</b> — Leituras, Salmo, Evangelho, homilia, Profissão de fé.</p><p><b>Liturgia Eucarística</b> — Ofertório, Consagração — o pão e o vinho tornam-se o Corpo e Sangue de Cristo.</p><p><b>Comunhão</b> — Pai-Nosso, sinal da paz, "Cordeiro de Deus" e a Comunhão.</p><p><b>Envio</b> — "Ide em paz." Somos enviados a viver o que celebramos.</p>`},
+};
+
+function aOpenReader(key){
+  const r=READINGS[key];if(!r){aToast('Conteúdo em breve');return;}
+  document.getElementById('ard-bartitle').textContent=r.title.split('·')[0].trim().slice(0,24);
+  document.getElementById('ard-sub').textContent=r.sub;
+  document.getElementById('ard-title').textContent=r.title;
+  document.getElementById('ard-meta').innerHTML=(r.meta||[]).map(m=>`<span class="a-meta-tag">${m}</span>`).join('');
+  let html=r.body;if(r.note)html+=`<div class="a-rd-note"><div class="nt">${r.note.t}</div><div class="nb">${r.note.b}</div></div>`;
+  document.getElementById('ard-body').innerHTML=html;
+  document.getElementById('aov-reader').classList.add('on');
+  document.querySelector('#aov-reader .a-over-scroll').scrollTop=0;
+}
+
+/* ═══════════ ORAÇÕES ═══════════ */
+const APRAYERS={
+  essenciais:[
+    {t:'Pai Nosso',s:'Ensinada por Jesus · Mt 6',body:`<p>${PAI}</p>`,note:{t:'Origem',b:'A única oração ensinada pelo próprio Cristo. Resume todo o Evangelho.'}},
+    {t:'Ave Maria',s:'Saudação angélica · Lc 1',body:`<p>${AVE}</p>`},
+    {t:'Glória ao Pai',s:'Louvor à Trindade',body:`<p>${GLORIA}</p>`},
+    {t:'Credo dos Apóstolos',s:'Profissão de fé',body:`<p>Creio em Deus Pai todo-poderoso, Criador do céu e da terra; e em Jesus Cristo, seu único Filho, nosso Senhor, que foi concebido pelo poder do Espírito Santo, nasceu da Virgem Maria, padeceu sob Pôncio Pilatos, foi crucificado, morto e sepultado; ressuscitou ao terceiro dia, subiu aos céus, está sentado à direita de Deus Pai. Creio no Espírito Santo, na santa Igreja Católica, na comunhão dos santos, na remissão dos pecados, na ressurreição da carne, na vida eterna. Amém.</p>`},
+    {t:'Ato de Contrição',s:'Arrependimento sincero',body:`<p>Meu Deus, porque sois infinitamente bom e digno de todo amor, pesa-me de coração todos os meus pecados. Detesto-os acima de todos os males, e proponho firmemente, com o auxílio da vossa graça, não mais vos ofender e fugir das ocasiões de pecado. Amém.</p>`},
+  ],
+  marianas:[
+    {t:'Salve Rainha',s:'Antífona medieval · séc. XI',body:`<p>Salve, Rainha, Mãe de misericórdia, vida, doçura e esperança nossa, salve! A vós bradamos, os degredados filhos de Eva; a vós suspiramos, gemendo e chorando neste vale de lágrimas. Eia, pois, advogada nossa, esses vossos olhos misericordiosos a nós volvei. Amém.</p>`},
+    {t:'Magnificat',s:'Cântico de Maria · Lc 1',body:`<p>A minha alma engrandece o Senhor e o meu espírito se alegra em Deus, meu Salvador. Desde agora me chamarão bem-aventurada todas as gerações, pois o Todo-Poderoso fez em mim maravilhas, e santo é o seu nome. Derrubou os poderosos de seus tronos e exaltou os humildes; encheu de bens os famintos e despediu os ricos de mãos vazias.</p>`},
+    {t:'Memorare',s:'Atribuída a São Bernardo',body:`<p>Lembrai-vos, ó piíssima Virgem Maria, que nunca se ouviu dizer que algum daqueles que recorreram à vossa proteção fosse abandonado. Animado com igual confiança, a vós recorro. Não desprezeis as minhas súplicas, ó Mãe do Filho de Deus. Amém.</p>`},
+    {t:'Sub Tuum Praesidium',s:'A mais antiga · séc. III',body:`<p>Sob vossa proteção nos refugiamos, santa Mãe de Deus. Não desprezeis as nossas súplicas em nossas necessidades, mas livrai-nos sempre de todos os perigos, ó Virgem gloriosa e bendita. Amém.</p>`},
+  ],
+  dia:[
+    {t:'Oferta da Manhã',s:'Consagrar o dia',body:`<p>Meu Deus, eu vos ofereço, em união com o Imaculado Coração de Maria, as orações, trabalhos, alegrias e sofrimentos deste dia, em reparação dos pecados e pelas intenções do Santo Padre. Amém.</p>`},
+    {t:'Anjo da Guarda',s:'Proteção',body:`<p>Santo Anjo do Senhor, meu zeloso guardador, se a ti me confiou a piedade divina, sempre me rege, me guarda, me governa e me ilumina. Amém.</p>`},
+    {t:'Exame da Noite',s:'Antes de dormir',body:`<p>Senhor, antes de descansar, olho para o dia que passou. Graças pelas bênçãos recebidas. Perdoai-me onde falhei. Protegei-me esta noite e dai-me a graça de ser melhor amanhã. Amém.</p>`},
+  ],
+  eucaristia:[
+    {t:'Comunhão Espiritual',s:'Quando não se pode comungar',body:`<p>Meu Jesus, creio que estais presente no Santíssimo Sacramento. Amo-vos sobre todas as coisas e desejo receber-vos em minha alma. Já que não posso receber-vos sacramentalmente, vinde ao menos espiritualmente ao meu coração. Amém.</p>`},
+    {t:'Anima Christi',s:'Após a Comunhão · Santo Inácio',body:`<p>Alma de Cristo, santificai-me. Corpo de Cristo, salvai-me. Sangue de Cristo, inebriai-me. Paixão de Cristo, confortai-me. Ó bom Jesus, ouvi-me. Na hora da morte, chamai-me. Amém.</p>`},
+  ],
+  vida:[
+    {t:'Pela Família',s:'Lar e parentes',body:`<p>Sagrada Família de Nazaré, abençoai a minha família. Que nosso lar seja espaço de fé, perdão e amor. Amém.</p>`},
+    {t:'Pelos Estudos',s:'Santo Tomás de Aquino',body:`<p>Ó Deus, fonte de toda sabedoria, iluminai a minha inteligência e fortalecei a minha memória para aprender com diligência e usar o conhecimento para o bem e para a vossa glória. Amém.</p>`},
+    {t:'Pelos Falecidos',s:'Almas do Purgatório',body:`<p>Dai-lhes, Senhor, o eterno descanso, e brilhe para eles a luz perpétua. Descansem em paz. Amém.</p>`},
+  ],
+};
+function aRenderPrayers(){
+  Object.keys(APRAYERS).forEach(cat=>{
+    const c=document.getElementById('or-'+cat);if(!c)return;
+    c.innerHTML=APRAYERS[cat].map((p,i)=>`<div class="a-li" onclick="aOpenPrayer('${cat}',${i})"><div class="a-li-body"><div class="a-li-t">${p.t}</div><div class="a-li-s">${p.s}</div></div><span class="a-li-arr">›</span></div>`).join('');
+  });
+}
+function aOpenPrayer(cat,i){
+  aState.prayers++;
+  saveStats('prayers',aState.prayers);
+  renderStreak();
+  syncStatsToSupabase();  // salva no Supabase se logado
+  const p=APRAYERS[cat][i];
+  document.getElementById('ard-bartitle').textContent=p.t;
+  document.getElementById('ard-sub').textContent=p.s;
+  document.getElementById('ard-title').textContent=p.t;
+  document.getElementById('ard-meta').innerHTML='';
+  let html=p.body;if(p.note)html+=`<div class="a-rd-note"><div class="nt">${p.note.t}</div><div class="nb">${p.note.b}</div></div>`;
+  document.getElementById('ard-body').innerHTML=html;
+  document.getElementById('aov-reader').classList.add('on');
+  document.querySelector('#aov-reader .a-over-scroll').scrollTop=0;
+}
+function aOrTab(cat,el){Object.keys(APRAYERS).forEach(c=>{const e=document.getElementById('or-'+c);if(e)e.style.display='none';});document.getElementById('or-'+cat).style.display='';document.querySelectorAll('#as-oracoes .a-cat').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+function aRezarTab(t,el){['tercos','novenas','devocoes','liturgia'].forEach(x=>{const e=document.getElementById('arz-'+x);if(e)e.style.display='none';});document.getElementById('arz-'+t).style.display='';document.querySelectorAll('#a-rezar-cats .a-cat').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+function aBibTab(t,el){['nt','at','temas'].forEach(x=>{const e=document.getElementById('b'+x);if(e)e.style.display='none';});document.getElementById('b'+t).style.display='';el.parentElement.querySelectorAll('.a-cat').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+
+/* ═══════════ TERÇO ═══════════ */
+const AMYST={
+  gozosos:{label:'Mistérios Gozosos',days:'Seg · Sáb',list:['A Anunciação do Anjo a Maria','A Visitação a Santa Isabel','O Nascimento de Jesus','A Apresentação no Templo','O Encontro de Jesus no Templo']},
+  luminosos:{label:'Mistérios Luminosos',days:'Quinta',list:['O Batismo no Jordão','As Bodas de Caná','O Anúncio do Reino','A Transfiguração','A Instituição da Eucaristia']},
+  dolorosos:{label:'Mistérios Dolorosos',days:'Ter · Sex',list:['A Agonia no Horto','A Flagelação','A Coroação de Espinhos','Jesus carrega a Cruz','A Crucificação e Morte']},
+  gloriosos:{label:'Mistérios Gloriosos',days:'Qua · Dom',list:['A Ressurreição','A Ascensão','A Vinda do Espírito Santo','A Assunção de Maria','A Coroação de Maria']},
+};
+function aMystOfDay(){const d=now.getDay();if(d===1||d===6)return'gozosos';if(d===4)return'luminosos';if(d===2||d===5)return'dolorosos';return'gloriosos';}
+let AT={mys:'gozosos',phase:'setup',init:0,dec:0,bead:0,intention:''};
+const AINIT=[
+  {n:'Sinal da Cruz e Oferenda',t:'Em nome do Pai, do Filho e do Espírito Santo. Amém.\n\nOfereço este Terço por minhas intenções, pela conversão dos pecadores e pelo Santo Padre.'},
+  {n:'Credo',t:'Creio em Deus Pai todo-poderoso, Criador do céu e da terra…'},
+  {n:'Pai Nosso',t:PAI},{n:'1ª Ave Maria — pela Fé',t:AVE},{n:'2ª Ave Maria — pela Esperança',t:AVE},{n:'3ª Ave Maria — pela Caridade',t:AVE},{n:'Glória ao Pai',t:GLORIA},
+];
+function aIllusSVG(){return`<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="ag" cx="50%" cy="30%"><stop offset="0%" stop-color="#3a5a8c"/><stop offset="100%" stop-color="#16243f"/></radialGradient></defs><rect width="400" height="140" fill="url(#ag)"/><circle cx="200" cy="58" r="30" fill="none" stroke="#C9A96B" stroke-width="1.2" opacity=".7"/><line x1="200" y1="34" x2="200" y2="82" stroke="#C9A96B" stroke-width="2" stroke-linecap="round" opacity=".85"/><line x1="176" y1="58" x2="224" y2="58" stroke="#C9A96B" stroke-width="2" stroke-linecap="round" opacity=".85"/><g fill="#C9A96B" opacity=".25"><circle cx="60" cy="110" r="2"/><circle cx="92" cy="122" r="2"/><circle cx="310" cy="118" r="2"/></g></svg>`;}
+function aStartTercio(){AT={mys:aMystOfDay(),phase:'setup',init:0,dec:0,bead:0,intention:''};aOpenOver('tercio');aRenderTercio();}
+function aRenderTercio(){
+  const c=document.getElementById('atercio-content');
+  if(AT.phase==='setup'){
+    c.innerHTML=`<div style="font-size:12px;color:var(--ink-faint);margin-bottom:5px">Hoje · ${AMYST[aMystOfDay()].days}</div><div class="a-rd-title">Santo Terço</div><p style="font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin:8px 0 18px">Escolha os mistérios e escreva sua intenção. O app guiará conta a conta.</p><div class="a-mystery-pick">${Object.keys(AMYST).map(k=>`<div class="a-myb ${k===AT.mys?'active':''}" onclick="pickAMys('${k}')"><span class="mn">${AMYST[k].label.replace('Mistérios ','')}</span><span class="md">${AMYST[k].days}</span></div>`).join('')}</div><textarea class="a-intention-input" id="at-int" rows="2" placeholder="Sua intenção (opcional)…">${AT.intention}</textarea><button class="a-btn a-btn-primary" onclick="beginATercio()">Iniciar o Terço</button>`;
+  } else if(AT.phase==='init'){
+    const s=AINIT[AT.init];
+    c.innerHTML=`<button class="a-back-link" onclick="AT.phase='setup';aRenderTercio()">‹ Mistérios</button><div class="a-mystery-illus">${aIllusSVG()}</div><div class="a-rosary-card"><div class="a-rosary-head"><span class="a-rosary-pname">${s.n}</span><span class="a-rosary-step">${AT.init+1} / ${AINIT.length}</span></div><div class="a-rosary-mys">${AMYST[AT.mys].label}</div><div class="a-prayer-read"><div class="a-prayer-read-txt">${s.t}</div></div><button class="a-btn a-btn-primary" onclick="nextAInit()">${AT.init<AINIT.length-1?'Próximo':'Começar as dezenas'}</button></div>`;
+  } else if(AT.phase==='dec'){
+    let name,txt;
+    if(AT.bead===0){name='Pai Nosso';txt=PAI;}
+    else if(AT.bead<=10){name=`${AT.bead}ª Ave Maria`;txt=AVE;}
+    else if(AT.bead===11){name='Glória ao Pai';txt=GLORIA;}
+    else{name='Ó meu Jesus';txt=FATIMA;}
+    const isLast=AT.dec===4&&AT.bead===12;
+    let beads='';for(let i=0;i<=12;i++){beads+=`<div class="a-bead ${(i===0||i>=11)?'lg':''} ${i<AT.bead?'done':i===AT.bead?'cur':''}"></div>`;}
+    c.innerHTML=`<button class="a-back-link" onclick="aCloseOver('tercio')">‹ Pausar</button><div class="a-rosary-card"><div class="a-rosary-head"><span class="a-rosary-pname">${name}</span><span class="a-rosary-step">${AT.dec+1}ª dezena</span></div><div class="a-rosary-mys">${AT.dec+1}º Mistério — ${AMYST[AT.mys].list[AT.dec]}</div><div class="a-beads">${beads}</div><div class="a-prayer-read"><div class="a-prayer-read-txt">${txt}</div></div><button class="a-btn a-btn-gold" onclick="nextABead()">${isLast?'Concluir dezenas':'✓ Rezado'}</button></div>`;
+  } else if(AT.phase==='end'){
+    c.innerHTML=`<button class="a-back-link" onclick="aCloseOver('tercio')">‹ Sair</button><div class="a-rosary-card"><div class="a-rosary-head"><span class="a-rosary-pname">Salve Rainha</span></div><div class="a-prayer-read"><div class="a-prayer-read-txt">Salve, Rainha, Mãe de misericórdia, vida, doçura e esperança nossa, salve! A vós bradamos, os degredados filhos de Eva… Rogai por nós, santa Mãe de Deus, para que sejamos dignos das promessas de Cristo. Amém.</div></div><button class="a-btn a-btn-primary" onclick="AT.phase='done';aRenderTercio()">Finalizar</button></div>`;
+  } else {
+    c.innerHTML=`<div class="a-complete"><div class="a-complete-glyph">✦</div><div class="a-complete-t">Terço concluído</div><div class="a-complete-s">${AT.intention?'Que Maria interceda pela sua intenção.':'Que Maria conduza você sempre mais perto de Jesus.'}</div><button class="a-btn a-btn-primary" style="max-width:220px;margin:0 auto" onclick="finishATercio()">Voltar</button></div>`;
+  }
+  document.getElementById('atercio-content').scrollTop=0;
+}
+function pickAMys(k){AT.mys=k;aRenderTercio();}
+function beginATercio(){const v=document.getElementById('at-int');if(v)AT.intention=v.value;AT.phase='init';AT.init=0;aRenderTercio();}
+function nextAInit(){if(AT.init<AINIT.length-1){AT.init++;}else{AT.phase='dec';AT.dec=0;AT.bead=0;}aRenderTercio();}
+function nextABead(){if(AT.dec===4&&AT.bead===12){AT.phase='end';aRenderTercio();return;}AT.bead++;if(AT.bead>12){AT.bead=0;AT.dec++;}if(AT.dec>4){AT.phase='end';}aRenderTercio();}
+function finishATercio(){
+  aState.tercos++;
+  const mins=aState.mins+18;
+  aState.mins=mins;
+  saveStats('tercos',aState.tercos);
+  saveStats('mins',mins);
+  renderStreak();
+  syncStatsToSupabase();  // salva no Supabase se logado
+  aCloseOver('tercio');
+  aToast('Terço registrado · +50 XP 🔥');
+}
+
+/* ═══════════ EXAME ═══════════ */
+const AEXAM=[
+  {n:1,t:'Amar a Deus sobre todas as coisas',qs:['Coloquei outras coisas acima de Deus?','Neguei ou tive vergonha da minha fé?','Recorri a superstições ou ocultismo?','Deixei a oração de lado por preguiça?']},
+  {n:2,t:'Não tomar o nome de Deus em vão',qs:['Usei o nome de Deus com irreverência?','Fiz juramentos falsos?','Blasfemei ou zombei de coisas sagradas?']},
+  {n:3,t:'Guardar domingos e festas',qs:['Faltei à Missa dominical por culpa própria?','Vivi o domingo como dia do Senhor?']},
+  {n:4,t:'Honrar pai e mãe',qs:['Fui desrespeitoso com meus pais?','Negligenciei familiares que precisavam de mim?']},
+  {n:5,t:'Não matar',qs:['Guardei ódio ou desejo de vingança?','Feri alguém com palavras ou humilhação?','Dei mau exemplo que levou outros ao mal?']},
+  {n:6,t:'Viver a castidade',qs:['Consenti em pensamentos ou desejos impuros?','Vi pornografia ou conteúdo impuro?']},
+  {n:7,t:'Não furtar',qs:['Tirei ou retive o que não era meu?','Fui desonesto no trabalho ou estudos?']},
+  {n:8,t:'Não levantar falso testemunho',qs:['Menti ou enganei alguém?','Falei mal dos outros (calúnia, fofoca)?']},
+  {n:9,t:'Não desejar a pessoa do próximo',qs:['Alimentei desejos sobre pessoa comprometida?']},
+  {n:10,t:'Não cobiçar bens alheios',qs:['Invejei o que os outros têm?','Fui ingrato pelos dons que recebi?']},
+];
+function aRenderExame(){
+  document.getElementById('aexame-content').innerHTML=`<div style="font-size:12px;color:var(--ink-faint);margin-bottom:5px">Preparação para a Confissão</div><div class="a-rd-title">Exame de Consciência</div><div class="a-exam-intro" style="margin-top:8px">À luz dos Dez Mandamentos, examine sua vida com sinceridade. Marque o que precisa levar à Confissão.</div>${AEXAM.map((cmd,ci)=>`<div class="a-exam-cmd" id="ac-${ci}"><div class="a-exam-cmd-head" onclick="atoggleCmd(${ci})"><div class="a-exam-num">${cmd.n}</div><div class="a-exam-t">${cmd.t}</div><div class="a-exam-cnt" id="acnt-${ci}"></div></div><div class="a-exam-body">${cmd.qs.map((q,qi)=>`<div class="a-exam-q" id="aq-${ci}-${qi}" onclick="atoggleQ(${ci},${qi})"><div class="a-exam-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><div class="a-exam-q-txt">${q}</div></div>`).join('')}</div></div>`).join('')}<button class="a-btn a-btn-primary" style="margin-top:12px" onclick="aBuildSummary()">Ver roteiro de Confissão</button><div id="a-exam-sum"></div>`;
+}
+function atoggleCmd(ci){document.getElementById('ac-'+ci).classList.toggle('open');}
+function atoggleQ(ci,qi){
+  const el=document.getElementById(`aq-${ci}-${qi}`);el.classList.toggle('on');
+  const key=`${ci}-${qi}`;
+  if(el.classList.contains('on'))aState.examChecked[key]=AEXAM[ci].qs[qi];else delete aState.examChecked[key];
+  const cnt=Object.keys(aState.examChecked).filter(k=>k.startsWith(ci+'-')).length;
+  document.getElementById('acnt-'+ci).textContent=cnt?cnt+'':'';
+}
+function aBuildSummary(){
+  const items=Object.values(aState.examChecked);const c=document.getElementById('a-exam-sum');
+  if(!items.length){c.innerHTML=`<div class="a-exam-summary"><div style="font-family:'Cormorant Garamond',serif;font-size:19px;margin-bottom:5px">Nada marcado</div><div style="font-size:13px;color:var(--ink-soft);line-height:1.5">Examine cada mandamento com calma. A confissão frequente fortalece a alma.</div></div>`;}
+  else{c.innerHTML=`<div class="a-exam-summary"><div style="font-family:'Cormorant Garamond',serif;font-size:21px;margin-bottom:5px">Seu roteiro</div><div style="font-size:12px;color:var(--ink-soft);line-height:1.5;margin-bottom:12px">Leve estes pontos à Confissão com sinceridade e confiança.</div>${items.map(i=>`<div style="display:flex;gap:9px;padding:8px 0;border-top:1px solid var(--line-soft);font-size:13px;line-height:1.4"><span style="color:var(--gold)">✦</span><span>${i}</span></div>`).join('')}<button class="a-btn a-btn-ghost" style="margin-top:14px" onclick="aOpenReader('confissao')">Como me confessar →</button></div>`;}
+  c.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ═══════════ CATECISMO ═══════════ */
+function aRenderCatecismo(){
+  const parts=[
+    {p:'I. A Profissão da Fé',items:[{n:'§27',t:'O desejo de Deus',b:'"O desejo de Deus está inscrito no coração do homem, pois o homem é criado por Deus e para Deus."'},{n:'§166',t:'O que é a fé',b:'A fé é a resposta livre do homem à iniciativa de Deus que se revela. Cremos com a Igreja e na Igreja.'}]},
+    {p:'II. Os Sacramentos',items:[{n:'§1131',t:'O que são os sacramentos',b:'São sinais eficazes da graça, instituídos por Cristo e confiados à Igreja, pelos quais nos é dada a vida divina.'},{n:'§1324',t:'A Eucaristia, fonte e ápice',b:'"A Eucaristia é fonte e ápice de toda a vida cristã." Nela está o próprio Cristo, nossa Páscoa.'}]},
+    {p:'III. A Vida em Cristo',items:[{n:'§1849',t:'O que é o pecado',b:'O pecado é uma falta contra a razão, a verdade e a consciência reta; é uma ofensa a Deus.'},{n:'§1803',t:'As virtudes',b:'"O fim de uma vida virtuosa consiste em tornar-se semelhante a Deus." (São Gregório de Nissa)'}]},
+    {p:'IV. A Oração',items:[{n:'§2559',t:'O que é a oração',b:'"A oração é a elevação da alma a Deus." A humildade é o fundamento da oração.'},{n:'§2761',t:'O Pai-Nosso',b:'A Oração do Senhor é "verdadeiramente o resumo de todo o Evangelho."'}]},
+  ];
+  document.getElementById('acatecismo-content').innerHTML=`<div class="a-rd-title">Catecismo da Igreja Católica</div><p style="font-size:13px;color:var(--ink-soft);line-height:1.55;margin:8px 0 20px">Seleção dos parágrafos essenciais. Toque para expandir.</p>${parts.map(part=>`<div style="font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.1em;padding:10px 0 8px">${part.p}</div>${part.items.map(it=>`<div class="a-fe-card" style="margin:0 0 11px" onclick="const b=this.querySelector('.a-fe-body');b.style.display=b.style.display==='block'?'none':'block'"><div class="a-fe-head"><div><div class="a-fe-eyebrow">${it.n}</div><div class="a-fe-name">${it.t}</div></div><span class="a-fe-chevron">⌄</span></div><div class="a-fe-body" style="display:none;font-size:13.5px;line-height:1.65;color:var(--ink-soft);border-top:1px solid var(--line-soft);padding:14px 0 2px">${it.b}</div></div>`).join('')}`).join('')}`;
+}
+
+/* ═══════════ SANTOS ═══════════ */
+const ASAINTS={
+  paulino:{n:'São Paulino de Nola',d:'Bispo · 354–431',pat:'Poetas, jardineiros',feast:'22 de junho',bio:'Nascido em rica família romana, vendeu seus bens, distribuiu aos pobres e se tornou bispo de Nola. Chegou a se oferecer como escravo para libertar o filho de uma viúva.',v:['Caridade radical','Desapego','Humildade'],frase:'"Não percamos tempo: a vida foge, e a eternidade nos espera."'},
+  agostinho:{n:'Santo Agostinho',d:'Bispo e Doutor · 354–430',pat:'Teólogos, conversões',feast:'28 de agosto',bio:'Converteu-se aos 31 anos, movido pelas orações de Santa Mônica. Bispo de Hipona e um dos maiores pensadores da história. As "Confissões" e "A Cidade de Deus" moldaram o Ocidente.',v:['Busca da Verdade','Conversão','Sabedoria'],frase:'"Fizeste-nos para Ti, e o nosso coração vive inquieto enquanto não repousa em Ti."'},
+  terezinha:{n:'Santa Teresinha',d:'Virgem e Doutora · 1873–1897',pat:'Missões, floristas',feast:'1 de outubro',bio:'Carmelita francesa que morreu aos 24 anos. Ensinou o "pequeno caminho": santidade em fazer pequenas coisas com grande amor e total confiança em Deus.',v:['Confiança','Simplicidade','Amor'],frase:'"Minha vocação é o amor."'},
+  francisco:{n:'São Francisco de Assis',d:'Fundador · 1181–1226',pat:'Ecologia, animais',feast:'4 de outubro',bio:'Renunciou à riqueza, fundou os Frades Menores, recebeu os estigmas e compôs o "Cântico das Criaturas".',v:['Pobreza','Paz','Alegria'],frase:'"Senhor, fazei-me instrumento de vossa paz."'},
+  faustina:{n:'Santa Faustina',d:'Virgem · 1905–1938',pat:'Divina Misericórdia',feast:'5 de outubro',bio:'Religiosa polonesa que recebeu revelações de Jesus sobre a Divina Misericórdia. Por ela se difundiram o Terço da Misericórdia e a Festa da Divina Misericórdia.',v:['Confiança','Misericórdia','Obediência'],frase:'"Jesus, eu confio em Vós."'},
+};
+function aRenderSantos(){
+  document.getElementById('asantos-content').innerHTML=`<div class="a-rd-title">Vida dos Santos</div><div style="height:16px"></div>${Object.keys(ASAINTS).map(k=>{const s=ASAINTS[k];return`<div class="a-li" onclick="aOpenSaint('${k}')"><div class="a-li-ico" style="background:linear-gradient(160deg,var(--marian),var(--marian-soft));color:#fff"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a3 3 0 013 3c0 1.3-.84 2.4-2 2.82V9h2a1 1 0 010 2h-2v2.5l3.5 6.5a1 1 0 01-.88 1.5H8.38a1 1 0 01-.88-1.5L11 13.5V11H9a1 1 0 010-2h2v-1.18A3 3 0 0112 2z"/></svg></div><div class="a-li-body"><div class="a-li-t">${s.n}</div><div class="a-li-s">${s.d} · ${s.feast}</div></div><span class="a-li-arr">›</span></div>`;}).join('')}`;
+}
+function aOpenSaint(k){
+  const s=ASAINTS[k];if(!s){aToast('Santo em breve');return;}
+  document.getElementById('ard-bartitle').textContent=s.n.split(' ').slice(0,2).join(' ');
+  document.getElementById('ard-sub').textContent=s.d;
+  document.getElementById('ard-title').textContent=s.n;
+  document.getElementById('ard-meta').innerHTML=`<span class="a-meta-tag">Festa: ${s.feast}</span><span class="a-meta-tag">${s.pat}</span>`;
+  document.getElementById('ard-body').innerHTML=`<p>${s.bio}</p><div class="a-rd-note"><div class="nt">Virtudes</div><div class="nb">${s.v.join(' · ')}</div></div><p style="font-style:italic;color:var(--marian);text-align:center;margin-top:20px">${s.frase}</p>`;
+  document.getElementById('aov-reader').classList.add('on');
+  document.querySelector('#aov-reader .a-over-scroll').scrollTop=0;
+}
+
+/* ═══════════ PERFIL ═══════════ */
+function aRenderPerfil(){
+  const badges=[
+    {i:'🔥',n:'Constância',d:'7 dias seguidos',l:0},{i:'📿',n:'Terço fiel',d:'30 terços',l:0},{i:'🌅',n:'Madrugador',d:'Laudes 10x',l:0},
+    {i:'📖',n:'Leitor',d:'Bíblia 50 dias',l:1},{i:'🕊',n:'Reconciliado',d:'1ª Confissão',l:0},{i:'👑',n:'Coroa de rosas',d:'100 terços',l:1},
+  ];
+  document.getElementById('aperfil-content').innerHTML=`
+    <div style="text-align:center;padding:10px 0 20px">
+      <div style="width:80px;height:80px;border-radius:24px;margin:0 auto 12px;background:linear-gradient(160deg,var(--marian),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Cormorant Garamond',serif;font-size:32px" id="pf-avatar">${(currentUser?.user_metadata?.first_name||'F')[0].toUpperCase()}</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500">${currentUser?.user_metadata?.first_name||''} ${currentUser?.user_metadata?.last_name||''}</div>
+      <div style="font-size:12px;color:var(--ink-soft);margin-top:3px">${currentUser?.email||''}</div>
+    </div>
+    <div style="display:flex;gap:10px;margin:0 0 20px">
+      <button class="a-btn a-btn-primary" style="font-size:13px;padding:12px" onclick="openEditPerfil()">✏️ Editar perfil</button>
+    </div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;margin-bottom:14px">Seu progresso</div>
+    <div class="a-streak" style="padding-left:0;padding-right:0">
+      <div class="a-chip gold"><div class="v">${aState.streak}<small>🔥</small></div><div class="l">sequência</div></div>
+      <div class="a-chip"><div class="v">${aState.tercos}</div><div class="l">terços</div></div>
+      <div class="a-chip"><div class="v">${aState.prayers}</div><div class="l">orações</div></div>
+      <div class="a-chip"><div class="v">${aState.mins||0}<small>min</small></div><div class="l">rezados</div></div>
+    </div>
+    <div class="a-list-eyebrow" style="padding-left:0;margin-top:8px">Conquistas</div>
+    <div class="a-badge-grid" style="padding:0">${badges.map(b=>`<div class="a-badge ${b.l?'locked':''}"><div class="a-badge-ico">${b.i}</div><div class="a-badge-name">${b.n}</div><div class="a-badge-desc">${b.d}</div></div>`).join('')}</div>
+    <button class="a-btn a-btn-ghost" style="margin-top:22px;font-size:12px;color:var(--rose)" onclick="if(confirm('Sair da conta?')){if(sb)sb.auth.signOut();currentUser=null;authToken=null;document.getElementById('a-user-badge').style.display='none';aCloseOver('perfil');localStorage.clear();}">Sair da conta</button>
+  `;
+}
+
+/* ═══════════ IA CATÓLICA ═══════════ */
+const IA_SYS=`Você é o "Assistente da Fé" do app Sanctus. Responda em português do Brasil, com tom sereno e reverente.\n\nREGRAS:\n1. Jamais invente doutrina. Fundamente-se no Catecismo (CIC), Sagrada Escritura e Magistério.\n2. Cite fontes brevemente (ex.: "CIC 1324", "Jo 6,51").\n3. NUNCA contradiga o Magistério.\n4. Se não tiver certeza, diga com honestidade.\n5. Não substitua a Confissão ou orientação de um padre.\n6. Seja conciso (2-4 parágrafos). Termine com encorajamento breve.\n\nQuando citar fontes, liste-as numa linha iniciando exatamente com "Fontes:".`;
+const aIaHistory=[];
+function aIaGrow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+function aIaKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aIaSend();}}
+function aIaSuggest(t){document.getElementById('a-ia-input').value=t;aIaSend();}
+function aEsc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function aAddMsg(role,text){
+  const w=document.getElementById('a-ia-welcome');if(w)w.remove();
+  const sc=document.getElementById('a-ia-scroll');
+  const div=document.createElement('div');div.className='a-msg '+role;
+  let fmt;
+  if(role==='ai'){const pts=text.split(/Fontes:/i);fmt=aEsc(pts[0].trim()).replace(/\n/g,'<br>');if(pts[1])fmt+=`<span class="src">Fontes:${aEsc(pts[1])}</span>`;}
+  else{fmt=aEsc(text).replace(/\n/g,'<br>');}
+  div.innerHTML=`<div class="a-bubble">${fmt}</div>`;
+  sc.appendChild(div);sc.scrollTop=sc.scrollHeight;
+}
+async function aIaSend(){
+  const inp=document.getElementById('a-ia-input');const txt=inp.value.trim();if(!txt)return;
+  inp.value='';inp.style.height='auto';
+  const btn=document.getElementById('a-ia-send');btn.disabled=true;
+  aAddMsg('user',txt);aIaHistory.push({role:'user',content:txt});
+  const sc=document.getElementById('a-ia-scroll');
+  const ty=document.createElement('div');ty.className='a-msg ai';ty.id='a-ia-ty';
+  ty.innerHTML=`<div class="a-bubble"><div class="a-ia-typing"><span></span><span></span><span></span></div></div>`;
+  sc.appendChild(ty);sc.scrollTop=sc.scrollHeight;
+  const body=JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:IA_SYS,messages:aIaHistory});
+  try{
+    let data;
+    if(SB_READY && currentUser && authToken){
+      try{
+        const r=await fetch(AI_EDGE_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+authToken},body});
+        data=await r.json();
+        if(data.error) throw new Error('edge_error');
+      }catch(e){
+        // Edge Function não deployada ainda — usa API direta
+        const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body});
+        data=await r.json();
+      }
+    } else {
+      const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body});
+      data=await r.json();
+    }
+    document.getElementById('a-ia-ty')?.remove();
+    const reply=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim()||'Não consegui responder agora. Tente novamente.';
+    aAddMsg('ai',reply);aIaHistory.push({role:'assistant',content:reply});
+  }catch(e){
+    document.getElementById('a-ia-ty')?.remove();
+    aAddMsg('ai','Não consegui me conectar. Verifique sua conexão e tente novamente.');
+  }
+  btn.disabled=false;
+}
+
+/* ═══════════ EDITAR PERFIL ═══════════ */
+function openEditPerfil(){
+  const u = currentUser;
+  if(!u){ aToast('Faça login para editar o perfil'); return; }
+  const fname = u.user_metadata?.first_name || '';
+  const lname = u.user_metadata?.last_name  || '';
+  const email = u.email || '';
+  document.getElementById('ep-fname').value = fname;
+  document.getElementById('ep-lname').value = lname;
+  document.getElementById('ep-email').value = email;
+  document.getElementById('ep-avatar').textContent = (fname||'F')[0].toUpperCase();
+  document.getElementById('ep-msg').textContent = '';
+  aOpenOver('editperfil');
+}
+async function saveProfile(){
+  const fname = document.getElementById('ep-fname').value.trim();
+  const lname = document.getElementById('ep-lname').value.trim();
+  const msg   = document.getElementById('ep-msg');
+  if(!fname||!lname){ msg.style.color='var(--rose)'; msg.textContent='Preencha nome e sobrenome.'; return; }
+  msg.style.color='var(--ink-faint)'; msg.textContent='Salvando…';
+  try{
+    // Atualiza metadados no Auth
+    if(sb && currentUser){
+      const { error } = await sb.auth.updateUser({
+        data:{ first_name:fname, last_name:lname, display_name:fname+' '+lname }
+      });
+      if(error) throw error;
+      // Atualiza no banco também
+      await sb.from('user_profiles').update({ first_name:fname, last_name:lname }).eq('id', currentUser.id);
+      // Atualiza o objeto local
+      currentUser.user_metadata = { ...currentUser.user_metadata, first_name:fname, last_name:lname, display_name:fname+' '+lname };
+    }
+    // Atualiza badge
+    const uname = document.getElementById('a-user-name');
+    if(uname) uname.textContent = fname;
+    msg.style.color='var(--green)'; msg.textContent='Perfil salvo! ✓';
+    setTimeout(()=>{ aCloseOver('editperfil'); aCloseOver('perfil'); aToast('Perfil atualizado ✓'); }, 1000);
+  } catch(e){
+    msg.style.color='var(--rose)'; msg.textContent='Erro ao salvar. Tente novamente.';
+  }
+}
+
+/* ═══════════ INIT ═══════════ */
+aRenderPrayers();
+</script>
+</body>
+</html>
